@@ -1,0 +1,128 @@
+---
+import Layout from '@layouts/Layout.astro';
+
+interface Product {
+  id: string;
+  name: string;
+  price: number;
+  category: string;
+  image: string;
+  description: string;
+}
+
+const products: Product[] = [
+  { id: '1', name: 'Arroz Carolino 1kg', price: 85, category: 'Alimentar', image: '/images/arroz.jpg', description: 'Arroz de qualidade premium' },
+  { id: '2', name: 'Feijão Manteiga 500g', price: 120, category: 'Alimentar', image: '/images/feijao.jpg', description: 'Feijão manteiga selecionado' },
+  { id: '3', name: 'Óleo Vegetal 750ml', price: 150, category: 'Alimentar', image: '/images/oleo.jpg', description: 'Óleo vegetal refinado' },
+  { id: '4', name: 'Frango Inteiro 1.5kg', price: 450, category: 'Talho', image: '/images/frango.jpg', description: 'Frango fresco do dia' },
+  { id: '5', name: 'Carne de Vaca 1kg', price: 650, category: 'Talho', image: '/images/vaca.jpg', description: 'Carne de vaca premium' },
+  { id: '6', name: 'Costeletas de Porco 800g', price: 380, category: 'Talho', image: '/images/costeletas.jpg', description: 'Costeletas frescas' },
+  { id: '7', name: 'Peixe Congelado 600g', price: 320, category: 'Congelados', image: '/images/peixe.jpg', description: 'Peixe congelado premium' },
+  { id: '8', name: 'Batatas Fritas 1kg', price: 180, category: 'Congelados', image: '/images/batatas.jpg', description: 'Batatas pré-fritas congeladas' },
+  { id: '9', name: 'Vegetais Mix 500g', price: 140, category: 'Congelados', image: '/images/vegetais.jpg', description: 'Mix de vegetais congelados' },
+  { id: '10', name: 'Detergente 500ml', price: 95, category: 'Limpeza', image: '/images/detergente.jpg', description: 'Detergente multiusos' },
+  { id: '11', name: 'Sabão em Pó 1kg', price: 120, category: 'Limpeza', image: '/images/sabao.jpg', description: 'Sabão para roupa' },
+  { id: '12', name: 'Desinfetante 1L', price: 150, category: 'Limpeza', image: '/images/desinfetante.jpg', description: 'Desinfetante antibacteriano' }
+];
+
+const categories = ['Todos', 'Alimentar', 'Talho', 'Congelados', 'Limpeza'];
+---
+
+<Layout title="Ayronia Mercado" description="Loja online Ayronia - Produtos de qualidade">
+  <div class="min-h-screen bg-base-200">
+    <div class="container mx-auto px-4 py-8">
+      <h1 class="text-4xl font-bold text-center mb-8">Ayronia Mercado</h1>
+      
+      <div class="flex flex-wrap gap-2 justify-center mb-8">
+        {categories.map(cat => (
+          <button 
+            class="btn btn-outline category-filter" 
+            data-category={cat}
+          >
+            {cat}
+          </button>
+        ))}
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" id="products-grid">
+        {products.map(product => (
+          <div class="card bg-base-100 shadow-xl product-card" data-category={product.category}>
+            <figure class="bg-gray-200 h-48 flex items-center justify-center">
+              <span class="text-6xl">{
+                product.category === 'Alimentar' ? '🌾' :
+                product.category === 'Talho' ? '🥩' :
+                product.category === 'Congelados' ? '❄️' :
+                '🧼'
+              }</span>
+            </figure>
+            <div class="card-body">
+              <h2 class="card-title text-lg">{product.name}</h2>
+              <p class="text-sm text-gray-600">{product.description}</p>
+              <div class="badge badge-primary">{product.category}</div>
+              <div class="flex justify-between items-center mt-4">
+                <span class="text-2xl font-bold">{product.price} MT</span>
+                <button 
+                  class="btn btn-primary btn-sm add-to-cart"
+                  data-product={JSON.stringify(product)}
+                >
+                  Adicionar
+                </button>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const filters = document.querySelectorAll('.category-filter');
+      const products = document.querySelectorAll('.product-card');
+      
+      filters.forEach(filter => {
+        filter.addEventListener('click', (e) => {
+          const category = (e.target as HTMLElement).dataset.category;
+          
+          filters.forEach(f => f.classList.remove('btn-active'));
+          (e.target as HTMLElement).classList.add('btn-active');
+          
+          products.forEach(product => {
+            const productCategory = (product as HTMLElement).dataset.category;
+            if (category === 'Todos' || productCategory === category) {
+              (product as HTMLElement).style.display = 'block';
+            } else {
+              (product as HTMLElement).style.display = 'none';
+            }
+          });
+        });
+      });
+
+      const addToCartButtons = document.querySelectorAll('.add-to-cart');
+      addToCartButtons.forEach(button => {
+        button.addEventListener('click', (e) => {
+          const productData = (e.target as HTMLElement).dataset.product;
+          if (productData) {
+            const product = JSON.parse(productData);
+            let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+            
+            const existingItem = cart.find((item: any) => item.id === product.id);
+            if (existingItem) {
+              existingItem.quantity += 1;
+            } else {
+              cart.push({ ...product, quantity: 1 });
+            }
+            
+            localStorage.setItem('cart', JSON.stringify(cart));
+            
+            const btn = e.target as HTMLElement;
+            btn.textContent = 'Adicionado!';
+            setTimeout(() => {
+              btn.textContent = 'Adicionar';
+            }, 1000);
+          }
+        });
+      });
+    });
+  </script>
+</Layout>
