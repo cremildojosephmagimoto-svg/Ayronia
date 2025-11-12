@@ -1,0 +1,290 @@
+---
+import Layout from '@layouts/Layout.astro';
+---
+
+<Layout title="Checkout" description="Finalizar compra - Ayronia">
+  <div class="min-h-screen bg-base-200">
+    <div class="container mx-auto px-4 py-8">
+      <h1 class="text-4xl font-bold mb-8">Finalizar Compra</h1>
+      
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div class="lg:col-span-2">
+          <div class="card bg-base-100 shadow-xl mb-6">
+            <div class="card-body">
+              <h2 class="card-title text-2xl mb-4">Dados de Entrega</h2>
+              <form id="checkout-form" class="space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div class="form-control">
+                    <label class="label">
+                      <span class="label-text">Nome Completo</span>
+                    </label>
+                    <input type="text" placeholder="Nome completo" class="input input-bordered" required />
+                  </div>
+                  <div class="form-control">
+                    <label class="label">
+                      <span class="label-text">Telefone</span>
+                    </label>
+                    <input type="tel" placeholder="+258 XX XXX XXXX" class="input input-bordered" required />
+                  </div>
+                </div>
+                <div class="form-control">
+                  <label class="label">
+                    <span class="label-text">Email</span>
+                  </label>
+                  <input type="email" placeholder="seu@email.com" class="input input-bordered" required />
+                </div>
+                <div class="form-control">
+                  <label class="label">
+                    <span class="label-text">Morada Completa</span>
+                  </label>
+                  <textarea class="textarea textarea-bordered h-24" placeholder="Rua, número, andar, etc." required></textarea>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div class="form-control">
+                    <label class="label">
+                      <span class="label-text">Cidade</span>
+                    </label>
+                    <input type="text" placeholder="Cidade" class="input input-bordered" required />
+                  </div>
+                  <div class="form-control">
+                    <label class="label">
+                      <span class="label-text">Código Postal</span>
+                    </label>
+                    <input type="text" placeholder="1100" class="input input-bordered" />
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <div class="card bg-base-100 shadow-xl">
+            <div class="card-body">
+              <h2 class="card-title text-2xl mb-4">Método de Pagamento</h2>
+              <div class="space-y-4">
+                <div class="form-control">
+                  <label class="label cursor-pointer border rounded-lg p-4 hover:bg-base-200">
+                    <div class="flex items-center gap-4">
+                      <input type="radio" name="payment" class="radio radio-primary" value="mpesa" checked />
+                      <div>
+                        <div class="text-2xl mb-1">📱</div>
+                        <span class="font-bold">M-Pesa</span>
+                        <p class="text-sm text-gray-600">Pagamento via M-Pesa</p>
+                      </div>
+                    </div>
+                  </label>
+                </div>
+                <div class="form-control">
+                  <label class="label cursor-pointer border rounded-lg p-4 hover:bg-base-200">
+                    <div class="flex items-center gap-4">
+                      <input type="radio" name="payment" class="radio radio-primary" value="card" />
+                      <div>
+                        <div class="text-2xl mb-1">💳</div>
+                        <span class="font-bold">Cartão de Crédito/Débito</span>
+                        <p class="text-sm text-gray-600">Visa, Mastercard</p>
+                      </div>
+                    </div>
+                  </label>
+                </div>
+
+                <div id="mpesa-form" class="mt-4 p-4 bg-base-200 rounded-lg">
+                  <h3 class="font-bold mb-3">Dados M-Pesa</h3>
+                  <div class="form-control">
+                    <label class="label">
+                      <span class="label-text">Número M-Pesa</span>
+                    </label>
+                    <input type="tel" placeholder="+258 8X XXX XXXX" class="input input-bordered" id="mpesa-number" />
+                  </div>
+                </div>
+
+                <div id="card-form" class="mt-4 p-4 bg-base-200 rounded-lg hidden">
+                  <h3 class="font-bold mb-3">Dados do Cartão</h3>
+                  <div class="space-y-3">
+                    <div class="form-control">
+                      <label class="label">
+                        <span class="label-text">Número do Cartão</span>
+                      </label>
+                      <input type="text" placeholder="1234 5678 9012 3456" class="input input-bordered" id="card-number" maxlength="19" />
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                      <div class="form-control">
+                        <label class="label">
+                          <span class="label-text">Validade</span>
+                        </label>
+                        <input type="text" placeholder="MM/AA" class="input input-bordered" id="card-expiry" maxlength="5" />
+                      </div>
+                      <div class="form-control">
+                        <label class="label">
+                          <span class="label-text">CVV</span>
+                        </label>
+                        <input type="text" placeholder="123" class="input input-bordered" id="card-cvv" maxlength="3" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="lg:col-span-1">
+          <div class="card bg-base-100 shadow-xl sticky top-4">
+            <div class="card-body">
+              <h2 class="card-title text-2xl mb-4">Resumo do Pedido</h2>
+              <div id="order-items" class="space-y-2 mb-4 max-h-60 overflow-y-auto">
+              </div>
+              <div class="divider"></div>
+              <div class="space-y-3">
+                <div class="flex justify-between">
+                  <span>Subtotal:</span>
+                  <span class="font-bold" id="checkout-subtotal">0 MT</span>
+                </div>
+                <div class="flex justify-between">
+                  <span>Entrega:</span>
+                  <span class="font-bold">50 MT</span>
+                </div>
+                <div class="divider my-2"></div>
+                <div class="flex justify-between text-xl">
+                  <span class="font-bold">Total:</span>
+                  <span class="font-bold text-primary" id="checkout-total">50 MT</span>
+                </div>
+              </div>
+              <div class="card-actions justify-end mt-6">
+                <button class="btn btn-primary btn-block btn-lg" id="confirm-order">
+                  Confirmar Pedido
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <dialog id="payment-modal" class="modal">
+    <div class="modal-box">
+      <h3 class="font-bold text-lg mb-4">Processando Pagamento</h3>
+      <div class="text-center py-8">
+        <div class="loading loading-spinner loading-lg mb-4"></div>
+        <p id="payment-status">A processar o seu pagamento...</p>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog id="success-modal" class="modal">
+    <div class="modal-box text-center">
+      <div class="text-6xl mb-4">✅</div>
+      <h3 class="font-bold text-2xl mb-4">Pedido Confirmado!</h3>
+      <p class="mb-2">Número do pedido: <span class="font-bold" id="order-number"></span></p>
+      <p class="mb-6">Receberá uma confirmação por email e SMS.</p>
+      <div class="modal-action justify-center">
+        <a href="/mercado" class="btn btn-primary">Continuar Comprando</a>
+      </div>
+    </div>
+  </dialog>
+
+  <script>
+    interface CartItem {
+      id: string;
+      name: string;
+      price: number;
+      quantity: number;
+    }
+
+    function renderOrderSummary() {
+      const cart: CartItem[] = JSON.parse(localStorage.getItem('cart') || '[]');
+      const orderItemsDiv = document.getElementById('order-items');
+      const subtotalEl = document.getElementById('checkout-subtotal');
+      const totalEl = document.getElementById('checkout-total');
+
+      if (!orderItemsDiv || !subtotalEl || !totalEl) return;
+
+      if (cart.length === 0) {
+        window.location.href = '/mercado';
+        return;
+      }
+
+      const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+      const total = subtotal + 50;
+
+      subtotalEl.textContent = `${subtotal} MT`;
+      totalEl.textContent = `${total} MT`;
+
+      orderItemsDiv.innerHTML = cart.map(item => `
+        <div class="flex justify-between text-sm">
+          <span>${item.name} x${item.quantity}</span>
+          <span class="font-bold">${item.price * item.quantity} MT</span>
+        </div>
+      `).join('');
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      renderOrderSummary();
+
+      const paymentRadios = document.querySelectorAll('input[name="payment"]');
+      const mpesaForm = document.getElementById('mpesa-form');
+      const cardForm = document.getElementById('card-form');
+
+      paymentRadios.forEach(radio => {
+        radio.addEventListener('change', (e) => {
+          const value = (e.target as HTMLInputElement).value;
+          if (value === 'mpesa') {
+            mpesaForm?.classList.remove('hidden');
+            cardForm?.classList.add('hidden');
+          } else {
+            mpesaForm?.classList.add('hidden');
+            cardForm?.classList.remove('hidden');
+          }
+        });
+      });
+
+      const cardNumberInput = document.getElementById('card-number') as HTMLInputElement;
+      cardNumberInput?.addEventListener('input', (e) => {
+        let value = (e.target as HTMLInputElement).value.replace(/\s/g, '');
+        value = value.match(/.{1,4}/g)?.join(' ') || value;
+        (e.target as HTMLInputElement).value = value;
+      });
+
+      const cardExpiryInput = document.getElementById('card-expiry') as HTMLInputElement;
+      cardExpiryInput?.addEventListener('input', (e) => {
+        let value = (e.target as HTMLInputElement).value.replace(/\D/g, '');
+        if (value.length >= 2) {
+          value = value.substring(0, 2) + '/' + value.substring(2, 4);
+        }
+        (e.target as HTMLInputElement).value = value;
+      });
+
+      document.getElementById('confirm-order')?.addEventListener('click', () => {
+        const form = document.getElementById('checkout-form') as HTMLFormElement;
+        if (!form.checkValidity()) {
+          form.reportValidity();
+          return;
+        }
+
+        const paymentMethod = (document.querySelector('input[name="payment"]:checked') as HTMLInputElement)?.value;
+        
+        const modal = document.getElementById('payment-modal') as HTMLDialogElement;
+        const statusEl = document.getElementById('payment-status');
+        
+        modal?.showModal();
+
+        if (paymentMethod === 'mpesa') {
+          statusEl!.textContent = 'A processar pagamento M-Pesa...';
+        } else {
+          statusEl!.textContent = 'A processar pagamento com cartão...';
+        }
+
+        setTimeout(() => {
+          modal?.close();
+          
+          const orderNumber = 'AYR' + Math.floor(Math.random() * 1000000).toString().padStart(6, '0');
+          document.getElementById('order-number')!.textContent = orderNumber;
+          
+          localStorage.removeItem('cart');
+          
+          const successModal = document.getElementById('success-modal') as HTMLDialogElement;
+          successModal?.showModal();
+        }, 3000);
+      });
+    });
+  </script>
+</Layout>

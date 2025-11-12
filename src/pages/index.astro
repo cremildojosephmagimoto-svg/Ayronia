@@ -1,0 +1,142 @@
+---
+import Layout from '@layouts/Layout.astro';
+---
+
+<Layout title="Ayronia - Bem-vindo" description="Loja online e serviços de catering em Moçambique">
+  <div class="min-h-screen">
+    <div class="hero bg-gradient-to-r from-primary to-secondary text-primary-content py-32">
+      <div class="hero-content text-center">
+        <div class="max-w-3xl">
+          <h1 class="text-6xl font-bold mb-6">Bem-vindo à Ayronia</h1>
+          <p class="text-2xl mb-8">A sua loja online de produtos de qualidade e serviços de catering profissional em Moçambique</p>
+          <div class="flex gap-4 justify-center flex-wrap">
+            <a href="/mercado" class="btn btn-lg btn-neutral">Ir às Compras</a>
+            <a href="/catering" class="btn btn-lg btn-outline">Serviços de Catering</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-base-200 py-20">
+      <div class="container mx-auto px-4">
+        <h2 class="text-4xl font-bold text-center mb-16">Os Nossos Serviços</h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <a href="/mercado" class="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow">
+            <figure class="bg-primary/10 h-48 flex items-center justify-center">
+              <span class="text-8xl">🛒</span>
+            </figure>
+            <div class="card-body">
+              <h2 class="card-title text-2xl">Ayronia Mercado</h2>
+              <p>Produtos alimentares, talho, congelados e limpeza com entrega ao domicílio.</p>
+              <div class="card-actions justify-end">
+                <button class="btn btn-primary">Comprar Agora</button>
+              </div>
+            </div>
+          </a>
+
+          <a href="/catering" class="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow">
+            <figure class="bg-secondary/10 h-48 flex items-center justify-center">
+              <span class="text-8xl">🍽️</span>
+            </figure>
+            <div class="card-body">
+              <h2 class="card-title text-2xl">Catering & Serviços</h2>
+              <p>Serviços profissionais de catering para eventos corporativos e festas privadas.</p>
+              <div class="card-actions justify-end">
+                <button class="btn btn-primary">Saber Mais</button>
+              </div>
+            </div>
+          </a>
+
+          <a href="/contactos" class="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow">
+            <figure class="bg-accent/10 h-48 flex items-center justify-center">
+              <span class="text-8xl">📞</span>
+            </figure>
+            <div class="card-body">
+              <h2 class="card-title text-2xl">Contactos</h2>
+              <p>Entre em contacto connosco. Estamos disponíveis para ajudar!</p>
+              <div class="card-actions justify-end">
+                <button class="btn btn-primary">Contactar</button>
+              </div>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-base-100 py-20">
+      <div class="container mx-auto px-4">
+        <h2 class="text-4xl font-bold text-center mb-16">Categorias Populares</h2>
+        
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+          <a href="/mercado" class="card bg-base-200 hover:bg-base-300 transition-colors">
+            <div class="card-body items-center text-center">
+              <span class="text-6xl mb-3">🌾</span>
+              <h3 class="card-title">Alimentar</h3>
+            </div>
+          </a>
+          
+          <a href="/mercado" class="card bg-base-200 hover:bg-base-300 transition-colors">
+            <div class="card-body items-center text-center">
+              <span class="text-6xl mb-3">🥩</span>
+              <h3 class="card-title">Talho</h3>
+            </div>
+          </a>
+          
+          <a href="/mercado" class="card bg-base-200 hover:bg-base-300 transition-colors">
+            <div class="card-body items-center text-center">
+              <span class="text-6xl mb-3">❄️</span>
+              <h3 class="card-title">Congelados</h3>
+            </div>
+          </a>
+          
+          <a href="/mercado" class="card bg-base-200 hover:bg-base-300 transition-colors">
+            <div class="card-body items-center text-center">
+              <span class="text-6xl mb-3">🧼</span>
+              <h3 class="card-title">Limpeza</h3>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-success text-success-content py-20">
+      <div class="container mx-auto px-4 text-center">
+        <div class="max-w-2xl mx-auto">
+          <span class="text-7xl mb-6 block">💬</span>
+          <h2 class="text-4xl font-bold mb-6">Fale Connosco no WhatsApp</h2>
+          <p class="text-xl mb-8">Tem alguma dúvida? Entre em contacto direto pelo WhatsApp!</p>
+          <a 
+            href="https://wa.me/258841234567?text=Olá! Gostaria de mais informações sobre a Ayronia." 
+            target="_blank"
+            class="btn btn-lg btn-neutral"
+          >
+            Abrir WhatsApp
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-base-200 py-20">
+      <div class="container mx-auto px-4">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+          <div>
+            <div class="text-5xl mb-4">🚚</div>
+            <h3 class="text-xl font-bold mb-2">Entrega Rápida</h3>
+            <p>Entregas em Maputo em 24h</p>
+          </div>
+          <div>
+            <div class="text-5xl mb-4">💳</div>
+            <h3 class="text-xl font-bold mb-2">Pagamento Seguro</h3>
+            <p>M-Pesa e Cartão</p>
+          </div>
+          <div>
+            <div class="text-5xl mb-4">✨</div>
+            <h3 class="text-xl font-bold mb-2">Qualidade Garantida</h3>
+            <p>Produtos selecionados</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</Layout>

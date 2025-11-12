@@ -1,0 +1,158 @@
+---
+import Layout from '@layouts/Layout.astro';
+---
+
+<Layout title="Carrinho de Compras" description="Seu carrinho de compras Ayronia">
+  <div class="min-h-screen bg-base-200">
+    <div class="container mx-auto px-4 py-8">
+      <h1 class="text-4xl font-bold mb-8">Carrinho de Compras</h1>
+      
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div class="lg:col-span-2">
+          <div class="card bg-base-100 shadow-xl">
+            <div class="card-body">
+              <div id="cart-items">
+              </div>
+              <div id="empty-cart" class="text-center py-12 hidden">
+                <div class="text-6xl mb-4">🛒</div>
+                <h2 class="text-2xl font-bold mb-4">Seu carrinho está vazio</h2>
+                <a href="/mercado" class="btn btn-primary">Continuar Comprando</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="lg:col-span-1">
+          <div class="card bg-base-100 shadow-xl sticky top-4">
+            <div class="card-body">
+              <h2 class="card-title text-2xl mb-4">Resumo do Pedido</h2>
+              <div class="space-y-3">
+                <div class="flex justify-between">
+                  <span>Subtotal:</span>
+                  <span class="font-bold" id="subtotal">0 MT</span>
+                </div>
+                <div class="flex justify-between">
+                  <span>Entrega:</span>
+                  <span class="font-bold">50 MT</span>
+                </div>
+                <div class="divider my-2"></div>
+                <div class="flex justify-between text-xl">
+                  <span class="font-bold">Total:</span>
+                  <span class="font-bold text-primary" id="total">50 MT</span>
+                </div>
+              </div>
+              <div class="card-actions justify-end mt-6">
+                <a href="/checkout" class="btn btn-primary btn-block btn-lg" id="checkout-btn">
+                  Finalizar Compra
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    interface CartItem {
+      id: string;
+      name: string;
+      price: number;
+      category: string;
+      image: string;
+      description: string;
+      quantity: number;
+    }
+
+    function renderCart() {
+      const cartItemsDiv = document.getElementById('cart-items');
+      const emptyCartDiv = document.getElementById('empty-cart');
+      const subtotalEl = document.getElementById('subtotal');
+      const totalEl = document.getElementById('total');
+      const checkoutBtn = document.getElementById('checkout-btn');
+      
+      if (!cartItemsDiv || !emptyCartDiv || !subtotalEl || !totalEl || !checkoutBtn) return;
+
+      const cart: CartItem[] = JSON.parse(localStorage.getItem('cart') || '[]');
+
+      if (cart.length === 0) {
+        cartItemsDiv.innerHTML = '';
+        emptyCartDiv.classList.remove('hidden');
+        checkoutBtn.classList.add('btn-disabled');
+        return;
+      }
+
+      emptyCartDiv.classList.add('hidden');
+      checkoutBtn.classList.remove('btn-disabled');
+
+      const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+      const deliveryFee = 50;
+      const total = subtotal + deliveryFee;
+
+      subtotalEl.textContent = `${subtotal} MT`;
+      totalEl.textContent = `${total} MT`;
+
+      cartItemsDiv.innerHTML = cart.map(item => `
+        <div class="flex gap-4 p-4 border-b" data-item-id="${item.id}">
+          <div class="w-20 h-20 bg-gray-200 rounded flex items-center justify-center text-3xl">
+            ${item.category === 'Alimentar' ? '🌾' :
+              item.category === 'Talho' ? '🥩' :
+              item.category === 'Congelados' ? '❄️' : '🧼'}
+          </div>
+          <div class="flex-1">
+            <h3 class="font-bold text-lg">${item.name}</h3>
+            <p class="text-sm text-gray-600">${item.category}</p>
+            <p class="text-lg font-bold mt-2">${item.price} MT</p>
+          </div>
+          <div class="flex flex-col items-end justify-between">
+            <button class="btn btn-ghost btn-sm btn-circle remove-item" data-id="${item.id}">✕</button>
+            <div class="flex items-center gap-2">
+              <button class="btn btn-sm decrease-qty" data-id="${item.id}">-</button>
+              <span class="px-4 font-bold">${item.quantity}</span>
+              <button class="btn btn-sm increase-qty" data-id="${item.id}">+</button>
+            </div>
+            <p class="font-bold text-lg">${item.price * item.quantity} MT</p>
+          </div>
+        </div>
+      `).join('');
+
+      document.querySelectorAll('.remove-item').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const id = (e.target as HTMLElement).dataset.id;
+          const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+          const newCart = cart.filter((item: CartItem) => item.id !== id);
+          localStorage.setItem('cart', JSON.stringify(newCart));
+          renderCart();
+        });
+      });
+
+      document.querySelectorAll('.increase-qty').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const id = (e.target as HTMLElement).dataset.id;
+          const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+          const item = cart.find((item: CartItem) => item.id === id);
+          if (item) {
+            item.quantity += 1;
+            localStorage.setItem('cart', JSON.stringify(cart));
+            renderCart();
+          }
+        });
+      });
+
+      document.querySelectorAll('.decrease-qty').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const id = (e.target as HTMLElement).dataset.id;
+          const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+          const item = cart.find((item: CartItem) => item.id === id);
+          if (item && item.quantity > 1) {
+            item.quantity -= 1;
+            localStorage.setItem('cart', JSON.stringify(cart));
+            renderCart();
+          }
+        });
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', renderCart);
+  </script>
+</Layout>

@@ -1,0 +1,115 @@
+---
+import Layout from '@layouts/Layout.astro';
+---
+
+<Layout title="Contactos" description="Entre em contacto com a Ayronia">
+  <div class="min-h-screen bg-base-200">
+    <div class="container mx-auto px-4 py-16">
+      <h1 class="text-4xl font-bold text-center mb-12">Contactos</h1>
+      
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div class="card bg-base-100 shadow-xl">
+          <div class="card-body">
+            <h2 class="card-title text-2xl mb-6">Entre em Contacto</h2>
+            <form class="space-y-4" id="contact-form">
+              <div class="form-control">
+                <label class="label">
+                  <span class="label-text">Nome</span>
+                </label>
+                <input type="text" placeholder="Seu nome" class="input input-bordered" required />
+              </div>
+              <div class="form-control">
+                <label class="label">
+                  <span class="label-text">Email</span>
+                </label>
+                <input type="email" placeholder="seu@email.com" class="input input-bordered" required />
+              </div>
+              <div class="form-control">
+                <label class="label">
+                  <span class="label-text">Telefone</span>
+                </label>
+                <input type="tel" placeholder="+258 XX XXX XXXX" class="input input-bordered" />
+              </div>
+              <div class="form-control">
+                <label class="label">
+                  <span class="label-text">Assunto</span>
+                </label>
+                <input type="text" placeholder="Assunto da mensagem" class="input input-bordered" required />
+              </div>
+              <div class="form-control">
+                <label class="label">
+                  <span class="label-text">Mensagem</span>
+                </label>
+                <textarea class="textarea textarea-bordered h-32" placeholder="Escreva a sua mensagem..." required></textarea>
+              </div>
+              <div class="form-control mt-6">
+                <button type="submit" class="btn btn-primary btn-lg w-full">Enviar Mensagem</button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <div class="space-y-6">
+          <div class="card bg-base-100 shadow-xl">
+            <div class="card-body">
+              <h2 class="card-title text-2xl mb-4">Informações de Contacto</h2>
+              <div class="space-y-4">
+                <div class="flex items-start gap-4">
+                  <div class="text-3xl">📍</div>
+                  <div>
+                    <h3 class="font-bold mb-1">Endereço</h3>
+                    <p>Avenida Principal, Nº 123<br />Maputo, Moçambique</p>
+                  </div>
+                </div>
+                <div class="flex items-start gap-4">
+                  <div class="text-3xl">📞</div>
+                  <div>
+                    <h3 class="font-bold mb-1">Telefone</h3>
+                    <p>+258 84 123 4567<br />+258 87 765 4321</p>
+                  </div>
+                </div>
+                <div class="flex items-start gap-4">
+                  <div class="text-3xl">✉️</div>
+                  <div>
+                    <h3 class="font-bold mb-1">Email</h3>
+                    <p>info@ayronia.co.mz<br />vendas@ayronia.co.mz</p>
+                  </div>
+                </div>
+                <div class="flex items-start gap-4">
+                  <div class="text-3xl">🕐</div>
+                  <div>
+                    <h3 class="font-bold mb-1">Horário de Funcionamento</h3>
+                    <p>Segunda a Sexta: 08:00 - 18:00<br />Sábado: 08:00 - 14:00<br />Domingo: Fechado</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card bg-success text-success-content shadow-xl">
+            <div class="card-body items-center text-center">
+              <div class="text-5xl mb-3">💬</div>
+              <h3 class="card-title text-2xl mb-3">WhatsApp</h3>
+              <p class="mb-4">Fale connosco directamente pelo WhatsApp!</p>
+              <a 
+                href="https://wa.me/258841234567?text=Olá! Gostaria de mais informações sobre a Ayronia." 
+                target="_blank"
+                class="btn btn-neutral btn-lg"
+              >
+                Abrir WhatsApp
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('contact-form')?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      alert('Obrigado pela sua mensagem! Responderemos em breve.');
+      (e.target as HTMLFormElement).reset();
+    });
+  </script>
+</Layout>
