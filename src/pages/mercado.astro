@@ -34,6 +34,24 @@ const categories = ['Todos', 'Alimentar', 'Talho', 'Congelados', 'Limpeza'];
       <h1 class="text-4xl font-bold text-center mb-8">🛒 Mercado</h1>
       <p class="text-center text-xl mb-8 text-base-content/70">Produtos alimentares, limpeza e congelados com entrega ao domicílio</p>
       
+      <div class="max-w-2xl mx-auto mb-8">
+        <div class="form-control">
+          <div class="input-group">
+            <input 
+              type="text" 
+              id="search-input"
+              placeholder="Pesquisar produtos..." 
+              class="input input-bordered w-full"
+            />
+            <button class="btn btn-square btn-primary">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
       <div class="flex flex-wrap gap-2 justify-center mb-8">
         {categories.map(cat => (
           <button 
@@ -81,22 +99,41 @@ const categories = ['Todos', 'Alimentar', 'Talho', 'Congelados', 'Limpeza'];
     document.addEventListener('DOMContentLoaded', () => {
       const filters = document.querySelectorAll('.category-filter');
       const products = document.querySelectorAll('.product-card');
+      const searchInput = document.getElementById('search-input') as HTMLInputElement;
+      let currentCategory = 'Todos';
+      
+      function filterProducts() {
+        const searchTerm = searchInput.value.toLowerCase();
+        
+        products.forEach(product => {
+          const productElement = product as HTMLElement;
+          const productCategory = productElement.dataset.category;
+          const productName = productElement.querySelector('.card-title')?.textContent?.toLowerCase() || '';
+          const productDescription = productElement.querySelector('.text-sm')?.textContent?.toLowerCase() || '';
+          
+          const matchesCategory = currentCategory === 'Todos' || productCategory === currentCategory;
+          const matchesSearch = searchTerm === '' || 
+                                productName.includes(searchTerm) || 
+                                productDescription.includes(searchTerm);
+          
+          if (matchesCategory && matchesSearch) {
+            productElement.style.display = 'block';
+          } else {
+            productElement.style.display = 'none';
+          }
+        });
+      }
+      
+      searchInput.addEventListener('input', filterProducts);
       
       filters.forEach(filter => {
         filter.addEventListener('click', (e) => {
-          const category = (e.target as HTMLElement).dataset.category;
+          currentCategory = (e.target as HTMLElement).dataset.category || 'Todos';
           
           filters.forEach(f => f.classList.remove('btn-active'));
           (e.target as HTMLElement).classList.add('btn-active');
           
-          products.forEach(product => {
-            const productCategory = (product as HTMLElement).dataset.category;
-            if (category === 'Todos' || productCategory === category) {
-              (product as HTMLElement).style.display = 'block';
-            } else {
-              (product as HTMLElement).style.display = 'none';
-            }
-          });
+          filterProducts();
         });
       });
 
