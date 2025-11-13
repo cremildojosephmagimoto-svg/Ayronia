@@ -22,40 +22,43 @@ import Layout from '@layouts/Layout.astro';
         <h2 class="text-4xl font-bold text-center mb-16">Os Nossos Serviços</h2>
         
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          <a href="/mercado" class="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow">
-            <figure class="bg-primary/10 h-48 flex items-center justify-center">
-              <span class="text-8xl">🛒</span>
+          <a href="/mercado" class="card bg-base-100 shadow-xl fade-in-up">
+            <figure class="bg-gradient-to-br from-primary/10 to-primary/5 h-56 flex items-center justify-center relative overflow-hidden">
+              <div class="absolute inset-0 bg-primary/5 backdrop-blur-sm"></div>
+              <span class="text-8xl relative z-10 transform hover:scale-110 transition-transform duration-300">🛒</span>
             </figure>
-            <div class="card-body">
-              <h2 class="card-title text-2xl">Ayronia Mercado</h2>
-              <p>Produtos alimentares, talho, congelados e limpeza com entrega ao domicílio.</p>
-              <div class="card-actions justify-end">
+            <div class="card-body mobile-center">
+              <h2 class="card-title text-2xl justify-center lg:justify-start">Ayronia Mercado</h2>
+              <p class="text-base-content/80">Produtos alimentares, talho, congelados e limpeza com entrega ao domicílio.</p>
+              <div class="card-actions justify-center lg:justify-end mt-4">
                 <button class="btn btn-primary">Comprar Agora</button>
               </div>
             </div>
           </a>
 
-          <a href="/catering" class="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow">
-            <figure class="bg-secondary/10 h-48 flex items-center justify-center">
-              <span class="text-8xl">🍽️</span>
+          <a href="/catering" class="card bg-base-100 shadow-xl fade-in-up">
+            <figure class="bg-gradient-to-br from-secondary/10 to-secondary/5 h-56 flex items-center justify-center relative overflow-hidden">
+              <div class="absolute inset-0 bg-secondary/5 backdrop-blur-sm"></div>
+              <span class="text-8xl relative z-10 transform hover:scale-110 transition-transform duration-300">🍽️</span>
             </figure>
-            <div class="card-body">
-              <h2 class="card-title text-2xl">Catering & Serviços</h2>
-              <p>Serviços profissionais de catering para eventos corporativos e festas privadas.</p>
-              <div class="card-actions justify-end">
+            <div class="card-body mobile-center">
+              <h2 class="card-title text-2xl justify-center lg:justify-start">Catering & Serviços</h2>
+              <p class="text-base-content/80">Serviços profissionais de catering para eventos corporativos e festas privadas.</p>
+              <div class="card-actions justify-center lg:justify-end mt-4">
                 <button class="btn btn-primary">Saber Mais</button>
               </div>
             </div>
           </a>
 
-          <a href="/contactos" class="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow">
-            <figure class="bg-accent/10 h-48 flex items-center justify-center">
-              <span class="text-8xl">📞</span>
+          <a href="/contactos" class="card bg-base-100 shadow-xl fade-in-up">
+            <figure class="bg-gradient-to-br from-accent/10 to-accent/5 h-56 flex items-center justify-center relative overflow-hidden">
+              <div class="absolute inset-0 bg-accent/5 backdrop-blur-sm"></div>
+              <span class="text-8xl relative z-10 transform hover:scale-110 transition-transform duration-300">📞</span>
             </figure>
-            <div class="card-body">
-              <h2 class="card-title text-2xl">Contactos</h2>
-              <p>Entre em contacto connosco. Estamos disponíveis para ajudar!</p>
-              <div class="card-actions justify-end">
+            <div class="card-body mobile-center">
+              <h2 class="card-title text-2xl justify-center lg:justify-start">Contactos</h2>
+              <p class="text-base-content/80">Entre em contacto connosco. Estamos disponíveis para ajudar!</p>
+              <div class="card-actions justify-center lg:justify-end mt-4">
                 <button class="btn btn-primary">Contactar</button>
               </div>
             </div>
@@ -69,30 +72,30 @@ import Layout from '@layouts/Layout.astro';
         <h2 class="text-4xl font-bold text-center mb-16">Categorias Populares</h2>
         
         <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
-          <a href="/mercado" class="card bg-base-200 hover:bg-base-300 transition-colors">
-            <div class="card-body items-center text-center">
-              <span class="text-6xl mb-3">🌾</span>
+          <a href="/mercado" class="card bg-base-200 shadow-md fade-in-up">
+            <div class="card-body items-center text-center mobile-center">
+              <span class="text-6xl mb-3 transform hover:scale-110 transition-transform duration-300">🌾</span>
               <h3 class="card-title">Alimentar</h3>
             </div>
           </a>
           
-          <a href="/mercado" class="card bg-base-200 hover:bg-base-300 transition-colors">
-            <div class="card-body items-center text-center">
-              <span class="text-6xl mb-3">🥩</span>
+          <a href="/mercado" class="card bg-base-200 shadow-md fade-in-up">
+            <div class="card-body items-center text-center mobile-center">
+              <span class="text-6xl mb-3 transform hover:scale-110 transition-transform duration-300">🥩</span>
               <h3 class="card-title">Talho</h3>
             </div>
           </a>
           
-          <a href="/mercado" class="card bg-base-200 hover:bg-base-300 transition-colors">
-            <div class="card-body items-center text-center">
-              <span class="text-6xl mb-3">❄️</span>
+          <a href="/mercado" class="card bg-base-200 shadow-md fade-in-up">
+            <div class="card-body items-center text-center mobile-center">
+              <span class="text-6xl mb-3 transform hover:scale-110 transition-transform duration-300">❄️</span>
               <h3 class="card-title">Congelados</h3>
             </div>
           </a>
           
-          <a href="/mercado" class="card bg-base-200 hover:bg-base-300 transition-colors">
-            <div class="card-body items-center text-center">
-              <span class="text-6xl mb-3">🧼</span>
+          <a href="/mercado" class="card bg-base-200 shadow-md fade-in-up">
+            <div class="card-body items-center text-center mobile-center">
+              <span class="text-6xl mb-3 transform hover:scale-110 transition-transform duration-300">🧼</span>
               <h3 class="card-title">Limpeza</h3>
             </div>
           </a>

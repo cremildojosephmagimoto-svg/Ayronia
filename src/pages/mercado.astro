@@ -46,21 +46,22 @@ const categories = ['Todos', 'Alimentar', 'Talho', 'Congelados', 'Limpeza'];
 
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" id="products-grid">
         {products.map(product => (
-          <div class="card bg-base-100 shadow-xl product-card" data-category={product.category}>
-            <figure class="bg-gray-200 h-48 flex items-center justify-center">
-              <span class="text-6xl">{
+          <div class="card bg-base-100 shadow-xl product-card fade-in-up" data-category={product.category}>
+            <figure class="bg-gradient-to-br from-base-200 to-base-300 h-56 flex items-center justify-center relative overflow-hidden">
+              <div class="absolute inset-0 bg-base-300/20"></div>
+              <span class="text-7xl relative z-10 transform hover:scale-110 transition-transform duration-300">{
                 product.category === 'Alimentar' ? '🌾' :
                 product.category === 'Talho' ? '🥩' :
                 product.category === 'Congelados' ? '❄️' :
                 '🧼'
               }</span>
             </figure>
-            <div class="card-body">
-              <h2 class="card-title text-lg">{product.name}</h2>
-              <p class="text-sm text-gray-600">{product.description}</p>
+            <div class="card-body mobile-center">
+              <h2 class="card-title text-lg justify-center md:justify-start">{product.name}</h2>
+              <p class="text-sm text-base-content/70">{product.description}</p>
               <div class="badge badge-primary">{product.category}</div>
-              <div class="flex justify-between items-center mt-4">
-                <span class="text-2xl font-bold">{product.price} MT</span>
+              <div class="flex flex-col md:flex-row justify-between items-center gap-4 mt-4">
+                <span class="text-2xl font-bold text-primary">{product.price} MT</span>
                 <button 
                   class="btn btn-primary btn-sm add-to-cart"
                   data-product={JSON.stringify(product)}
