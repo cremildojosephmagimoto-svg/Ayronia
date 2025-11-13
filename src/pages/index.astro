@@ -7,8 +7,8 @@ import Layout from '@layouts/Layout.astro';
     <div class="hero bg-gradient-to-r from-primary to-secondary text-primary-content py-32">
       <div class="hero-content text-center">
         <div class="max-w-3xl">
-          <h1 class="text-6xl font-bold mb-6">Bem-vindo à Ayronia</h1>
-          <p class="text-2xl mb-8">A sua loja online de produtos de qualidade e serviços de catering profissional em Moçambique</p>
+          <h1 class="text-6xl font-bold mb-6">🏠 Bem-vindo à Ayronia</h1>
+          <p class="text-2xl mb-8">Qualidade, Sabor e Serviço de Excelência em Pemba</p>
           <div class="flex gap-4 justify-center flex-wrap">
             <a href="/mercado" class="btn btn-lg btn-neutral">Ir às Compras</a>
             <a href="/catering" class="btn btn-lg btn-outline">Serviços de Catering</a>
@@ -22,13 +22,27 @@ import Layout from '@layouts/Layout.astro';
         <h2 class="text-4xl font-bold text-center mb-16">Os Nossos Serviços</h2>
         
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <a href="/catering" class="card bg-base-100 shadow-xl fade-in-up">
+            <figure class="bg-gradient-to-br from-secondary/10 to-secondary/5 h-56 flex items-center justify-center relative overflow-hidden">
+              <div class="absolute inset-0 bg-secondary/5 backdrop-blur-sm"></div>
+              <span class="text-8xl relative z-10 transform hover:scale-110 transition-transform duration-300">🍽️</span>
+            </figure>
+            <div class="card-body mobile-center">
+              <h2 class="card-title text-2xl justify-center lg:justify-start">Catering & Eventos</h2>
+              <p class="text-base-content/80">Serviços profissionais de catering para eventos corporativos e festas privadas com menus personalizados.</p>
+              <div class="card-actions justify-center lg:justify-end mt-4">
+                <button class="btn btn-primary">Saber Mais</button>
+              </div>
+            </div>
+          </a>
+
           <a href="/mercado" class="card bg-base-100 shadow-xl fade-in-up">
             <figure class="bg-gradient-to-br from-primary/10 to-primary/5 h-56 flex items-center justify-center relative overflow-hidden">
               <div class="absolute inset-0 bg-primary/5 backdrop-blur-sm"></div>
               <span class="text-8xl relative z-10 transform hover:scale-110 transition-transform duration-300">🛒</span>
             </figure>
             <div class="card-body mobile-center">
-              <h2 class="card-title text-2xl justify-center lg:justify-start">Ayronia Mercado</h2>
+              <h2 class="card-title text-2xl justify-center lg:justify-start">Mini Mercado Ayronia</h2>
               <p class="text-base-content/80">Produtos alimentares, talho, congelados e limpeza com entrega ao domicílio.</p>
               <div class="card-actions justify-center lg:justify-end mt-4">
                 <button class="btn btn-primary">Comprar Agora</button>
@@ -36,28 +50,42 @@ import Layout from '@layouts/Layout.astro';
             </div>
           </a>
 
-          <a href="/catering" class="card bg-base-100 shadow-xl fade-in-up">
-            <figure class="bg-gradient-to-br from-secondary/10 to-secondary/5 h-56 flex items-center justify-center relative overflow-hidden">
-              <div class="absolute inset-0 bg-secondary/5 backdrop-blur-sm"></div>
-              <span class="text-8xl relative z-10 transform hover:scale-110 transition-transform duration-300">🍽️</span>
+          <a href="/servicos" class="card bg-base-100 shadow-xl fade-in-up">
+            <figure class="bg-gradient-to-br from-accent/10 to-accent/5 h-56 flex items-center justify-center relative overflow-hidden">
+              <div class="absolute inset-0 bg-accent/5 backdrop-blur-sm"></div>
+              <span class="text-8xl relative z-10 transform hover:scale-110 transition-transform duration-300">🧰</span>
             </figure>
             <div class="card-body mobile-center">
-              <h2 class="card-title text-2xl justify-center lg:justify-start">Catering & Serviços</h2>
-              <p class="text-base-content/80">Serviços profissionais de catering para eventos corporativos e festas privadas.</p>
+              <h2 class="card-title text-2xl justify-center lg:justify-start">Serviços</h2>
+              <p class="text-base-content/80">Planeamento de eventos, entregas ao domicílio e consultoria especializada em catering.</p>
               <div class="card-actions justify-center lg:justify-end mt-4">
-                <button class="btn btn-primary">Saber Mais</button>
+                <button class="btn btn-primary">Ver Serviços</button>
+              </div>
+            </div>
+          </a>
+
+          <a href="/sobre" class="card bg-base-100 shadow-xl fade-in-up">
+            <figure class="bg-gradient-to-br from-info/10 to-info/5 h-56 flex items-center justify-center relative overflow-hidden">
+              <div class="absolute inset-0 bg-info/5 backdrop-blur-sm"></div>
+              <span class="text-8xl relative z-10 transform hover:scale-110 transition-transform duration-300">🏢</span>
+            </figure>
+            <div class="card-body mobile-center">
+              <h2 class="card-title text-2xl justify-center lg:justify-start">Sobre Nós</h2>
+              <p class="text-base-content/80">Conheça a nossa história, missão, visão e valores. Saiba mais sobre a Ayronia.</p>
+              <div class="card-actions justify-center lg:justify-end mt-4">
+                <button class="btn btn-primary">Conhecer</button>
               </div>
             </div>
           </a>
 
           <a href="/contactos" class="card bg-base-100 shadow-xl fade-in-up">
-            <figure class="bg-gradient-to-br from-accent/10 to-accent/5 h-56 flex items-center justify-center relative overflow-hidden">
-              <div class="absolute inset-0 bg-accent/5 backdrop-blur-sm"></div>
+            <figure class="bg-gradient-to-br from-success/10 to-success/5 h-56 flex items-center justify-center relative overflow-hidden">
+              <div class="absolute inset-0 bg-success/5 backdrop-blur-sm"></div>
               <span class="text-8xl relative z-10 transform hover:scale-110 transition-transform duration-300">📞</span>
             </figure>
             <div class="card-body mobile-center">
-              <h2 class="card-title text-2xl justify-center lg:justify-start">Contactos</h2>
-              <p class="text-base-content/80">Entre em contacto connosco. Estamos disponíveis para ajudar!</p>
+              <h2 class="card-title text-2xl justify-center lg:justify-start">Contacto</h2>
+              <p class="text-base-content/80">Entre em contacto através de WhatsApp, telefone, formulário ou visite-nos em Pemba.</p>
               <div class="card-actions justify-center lg:justify-end mt-4">
                 <button class="btn btn-primary">Contactar</button>
               </div>
