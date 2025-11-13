@@ -1,0 +1,144 @@
+---
+import Layout from '@layouts/Layout.astro';
+
+const services = [
+  {
+    title: 'Planeamento de Eventos',
+    description: 'Planeamento completo e organização profissional de eventos corporativos e privados',
+    icon: '🎯',
+    features: ['Consultoria personalizada', 'Gestão de fornecedores', 'Coordenação no dia do evento', 'Decoração e ambientação']
+  },
+  {
+    title: 'Entregas ao Domicílio',
+    description: 'Serviço de entrega rápida e segura de produtos e refeições em Pemba',
+    icon: '🚚',
+    features: ['Entrega rápida', 'Horário flexível (9h-19h)', 'Rastreamento de pedidos', 'Embalagens seguras']
+  },
+  {
+    title: 'Consultoria em Catering',
+    description: 'Aconselhamento especializado para o seu evento perfeito',
+    icon: '💼',
+    features: ['Análise de necessidades', 'Sugestão de menus', 'Orçamentos detalhados', 'Soluções personalizadas']
+  }
+];
+---
+
+<Layout title="Serviços Ayronia" description="Serviços especializados da Ayronia - Planeamento, Entregas e Consultoria">
+  <div class="min-h-screen bg-base-200">
+    <div class="hero bg-primary text-primary-content py-20">
+      <div class="hero-content text-center">
+        <div class="max-w-2xl">
+          <h1 class="text-5xl font-bold mb-4">🧰 Serviços</h1>
+          <p class="text-xl">Soluções completas para tornar o seu evento ou dia a dia mais fácil</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="container mx-auto px-4 py-16">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+        {services.map(service => (
+          <div class="card bg-base-100 shadow-xl fade-in-up hover:shadow-2xl transition-shadow">
+            <figure class="bg-gradient-to-br from-primary/10 to-secondary/5 h-48 flex items-center justify-center relative overflow-hidden">
+              <div class="absolute inset-0 bg-primary/5"></div>
+              <div class="text-7xl relative z-10 transform hover:scale-110 transition-transform duration-300">{service.icon}</div>
+            </figure>
+            <div class="card-body items-center text-center md:items-start md:text-left mobile-center">
+              <h2 class="card-title text-2xl mb-3 justify-center md:justify-start">{service.title}</h2>
+              <p class="mb-4 text-base-content/80">{service.description}</p>
+              <ul class="list-none space-y-2 w-full">
+                {service.features.map(feature => (
+                  <li class="flex items-center justify-center md:justify-start gap-2">
+                    <span class="text-primary text-lg">✓</span>
+                    <span>{feature}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
+        <div class="card bg-gradient-to-br from-primary/5 to-secondary/5 shadow-xl">
+          <div class="card-body">
+            <h3 class="card-title text-3xl mb-4">🏢 Serviços Corporativos</h3>
+            <p class="text-lg mb-4">Soluções especializadas para empresas</p>
+            <ul class="space-y-3">
+              <li class="flex items-start gap-3">
+                <span class="text-primary text-xl">→</span>
+                <div>
+                  <strong>Refeições diárias para empresas</strong>
+                  <p class="text-sm text-base-content/70">Planos semanais e mensais com menus variados</p>
+                </div>
+              </li>
+              <li class="flex items-start gap-3">
+                <span class="text-primary text-xl">→</span>
+                <div>
+                  <strong>Coffee breaks e eventos corporativos</strong>
+                  <p class="text-sm text-base-content/70">Serviço completo para reuniões e conferências</p>
+                </div>
+              </li>
+              <li class="flex items-start gap-3">
+                <span class="text-primary text-xl">→</span>
+                <div>
+                  <strong>Fornecimento de produtos</strong>
+                  <p class="text-sm text-base-content/70">Produtos para cantinas e refeitórios empresariais</p>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="card bg-gradient-to-br from-secondary/5 to-accent/5 shadow-xl">
+          <div class="card-body">
+            <h3 class="card-title text-3xl mb-4">🎉 Serviços para Festas</h3>
+            <p class="text-lg mb-4">Torne a sua celebração inesquecível</p>
+            <ul class="space-y-3">
+              <li class="flex items-start gap-3">
+                <span class="text-secondary text-xl">→</span>
+                <div>
+                  <strong>Casamentos e bodas</strong>
+                  <p class="text-sm text-base-content/70">Serviço completo de catering e organização</p>
+                </div>
+              </li>
+              <li class="flex items-start gap-3">
+                <span class="text-secondary text-xl">→</span>
+                <div>
+                  <strong>Aniversários e celebrações</strong>
+                  <p class="text-sm text-base-content/70">Festas infantis, adultos e eventos temáticos</p>
+                </div>
+              </li>
+              <li class="flex items-start gap-3">
+                <span class="text-secondary text-xl">→</span>
+                <div>
+                  <strong>Batizados e eventos religiosos</strong>
+                  <p class="text-sm text-base-content/70">Catering tradicional e personalizado</p>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="card bg-success text-success-content shadow-xl">
+        <div class="card-body items-center text-center">
+          <div class="text-6xl mb-4">📞</div>
+          <h3 class="card-title text-3xl mb-4">Solicite os Nossos Serviços</h3>
+          <p class="text-lg mb-6 max-w-2xl">Entre em contacto connosco para discutir as suas necessidades e receber um orçamento personalizado</p>
+          <div class="flex gap-4 flex-wrap justify-center">
+            <a href="/contactos" class="btn btn-neutral btn-lg">
+              Formulário de Contacto
+            </a>
+            <a 
+              href="https://wa.me/258849220000?text=Olá! Gostaria de informações sobre os serviços da Ayronia." 
+              target="_blank"
+              class="btn btn-outline btn-lg"
+            >
+              WhatsApp
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</Layout>
