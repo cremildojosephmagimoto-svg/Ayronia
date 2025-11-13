@@ -19,17 +19,12 @@ const customLinks = [
 
 <nav class="p-4 sm:p-5" data-sb-field-path={fieldPath}>
     <div class="flex items-center justify-between w-full gap-6 mx-auto max-w-7xl">
-        {
-            logo?.src ? (
-                <a class="flex items-center" href="/">
-                    <ResponsiveImage _id={logo._id} src={logo.src} width={logo.dimensions?.width} height={logo.dimensions?.height} alt={logo.alt} />
-                </a>
-            ) : (
-                <a class="text-xl font-bold sm:text-2xl" href="/" data-sb-field-path=".title">
-                    {title || 'Ayronia'}
-                </a>
-            )
-        }
+        <a class="flex items-center gap-3" href="/">
+            <img src="/images/logo.png" alt="Ayronia Logo" class="h-12 w-auto sm:h-14" />
+            <span class="text-xl font-bold sm:text-2xl font-heading" data-sb-field-path=".title">
+                {title || 'Ayronia'}
+            </span>
+        </a>
         <div class="flex items-center gap-6">
             <ul class="hidden lg:flex lg:flex-wrap lg:items-center lg:gap-6">
                 {customLinks.map(link => (
