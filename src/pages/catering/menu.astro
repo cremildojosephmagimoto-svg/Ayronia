@@ -1,0 +1,141 @@
+---
+import Layout from '@layouts/Layout.astro';
+
+const menuCategories = [
+  {
+    category: 'Entradas',
+    items: [
+      { name: 'Salada Caesar', description: 'Alface romana, croutons, parmesão e molho Caesar', price: '350 MT' },
+      { name: 'Bruschetta Italiana', description: 'Tomate fresco, manjericão, alho e azeite', price: '280 MT' },
+      { name: 'Croquetes de Camarão', description: 'Camarão fresco empanado com molho especial', price: '450 MT' },
+      { name: 'Tábua de Queijos', description: 'Seleção de queijos artesanais e frutas', price: '520 MT' }
+    ]
+  },
+  {
+    category: 'Pratos Principais',
+    items: [
+      { name: 'Frango Grelhado', description: 'Peito de frango com legumes salteados', price: '550 MT' },
+      { name: 'Peixe do Dia', description: 'Peixe fresco grelhado com arroz de coco', price: '750 MT' },
+      { name: 'Bife à Ayronia', description: 'Bife de vaca com molho especial e batatas', price: '850 MT' },
+      { name: 'Caril de Camarão', description: 'Camarão tigre em molho de caril com arroz', price: '820 MT' },
+      { name: 'Lasanha Vegetariana', description: 'Camadas de legumes frescos e queijo', price: '480 MT' }
+    ]
+  },
+  {
+    category: 'Sobremesas',
+    items: [
+      { name: 'Mousse de Chocolate', description: 'Mousse cremoso de chocolate belga', price: '250 MT' },
+      { name: 'Pudim Flan', description: 'Pudim caseiro com calda de caramelo', price: '220 MT' },
+      { name: 'Tarte de Limão', description: 'Tarte refrescante com merengue', price: '280 MT' },
+      { name: 'Salada de Frutas', description: 'Frutas frescas da época', price: '200 MT' }
+    ]
+  },
+  {
+    category: 'Bebidas',
+    items: [
+      { name: 'Sumos Naturais', description: 'Laranja, abacaxi, manga ou maracujá', price: '120 MT' },
+      { name: 'Refrigerantes', description: 'Coca-Cola, Sprite, Fanta', price: '80 MT' },
+      { name: 'Água Mineral', description: '500ml', price: '50 MT' },
+      { name: 'Café Expresso', description: 'Café italiano', price: '100 MT' }
+    ]
+  }
+];
+---
+
+<Layout title="Menu Catering - Ayronia" description="Menu completo dos serviços de catering Ayronia">
+  <div class="min-h-screen bg-base-200">
+    <div class="hero bg-primary text-primary-content py-20">
+      <div class="hero-content text-center">
+        <div class="max-w-2xl">
+          <h1 class="text-5xl font-bold mb-4">Menu Catering</h1>
+          <p class="text-xl">Descubra as nossas deliciosas opções para o seu evento</p>
+          <div class="mt-6">
+            <a href="/catering" class="btn btn-secondary">← Voltar aos Serviços</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="container mx-auto px-4 py-16">
+      <div class="alert alert-info mb-8">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current shrink-0 w-6 h-6">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+        <span>Todos os pratos podem ser adaptados para eventos. Os preços são por pessoa e podem variar conforme o número de convidados.</span>
+      </div>
+
+      {menuCategories.map((section) => (
+        <div class="mb-12">
+          <h2 class="text-4xl font-bold mb-6 text-primary border-b-4 border-primary pb-2">
+            {section.category}
+          </h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {section.items.map((item) => (
+              <div class="card bg-base-100 shadow-lg hover:shadow-xl transition-shadow">
+                <div class="card-body">
+                  <div class="flex justify-between items-start">
+                    <h3 class="card-title text-xl">{item.name}</h3>
+                    <span class="badge badge-primary badge-lg">{item.price}</span>
+                  </div>
+                  <p class="text-base-content/70">{item.description}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+
+      <div class="divider my-16"></div>
+
+      <div class="card bg-primary text-primary-content shadow-xl">
+        <div class="card-body text-center">
+          <h2 class="card-title text-3xl justify-center mb-4">Personalize o Seu Menu</h2>
+          <p class="text-lg mb-6">
+            Todos os nossos menus podem ser personalizados de acordo com as suas necessidades e preferências.
+            Entre em contacto connosco para criar um menu exclusivo para o seu evento.
+          </p>
+          <div class="card-actions justify-center">
+            <a href="/catering#catering-form" class="btn btn-secondary btn-lg">
+              Solicitar Orçamento Personalizado
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="stat bg-base-100 shadow">
+          <div class="stat-figure text-primary">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="inline-block w-8 h-8 stroke-current">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+          </div>
+          <div class="stat-title">Ingredientes</div>
+          <div class="stat-value text-primary">100%</div>
+          <div class="stat-desc">Frescos e Locais</div>
+        </div>
+
+        <div class="stat bg-base-100 shadow">
+          <div class="stat-figure text-secondary">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="inline-block w-8 h-8 stroke-current">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path>
+            </svg>
+          </div>
+          <div class="stat-title">Opções</div>
+          <div class="stat-value text-secondary">Flexíveis</div>
+          <div class="stat-desc">Adaptamos ao seu gosto</div>
+        </div>
+
+        <div class="stat bg-base-100 shadow">
+          <div class="stat-figure text-accent">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="inline-block w-8 h-8 stroke-current">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+            </svg>
+          </div>
+          <div class="stat-title">Serviço</div>
+          <div class="stat-value text-accent">Rápido</div>
+          <div class="stat-desc">Entrega pontual</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</Layout>
