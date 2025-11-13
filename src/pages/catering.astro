@@ -40,14 +40,20 @@ const services = [
     <div class="container mx-auto px-4 py-16">
       <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
         {services.map(service => (
-          <div class="card bg-base-100 shadow-xl">
-            <div class="card-body items-center text-center">
-              <div class="text-6xl mb-4">{service.icon}</div>
-              <h2 class="card-title text-2xl mb-3">{service.title}</h2>
-              <p class="mb-4">{service.description}</p>
-              <ul class="list-disc list-inside text-left w-full">
+          <div class="card bg-base-100 shadow-xl fade-in-up">
+            <figure class="bg-gradient-to-br from-primary/10 to-secondary/5 h-48 flex items-center justify-center relative overflow-hidden">
+              <div class="absolute inset-0 bg-primary/5"></div>
+              <div class="text-7xl relative z-10 transform hover:scale-110 transition-transform duration-300">{service.icon}</div>
+            </figure>
+            <div class="card-body items-center text-center md:items-start md:text-left mobile-center">
+              <h2 class="card-title text-2xl mb-3 justify-center md:justify-start">{service.title}</h2>
+              <p class="mb-4 text-base-content/80">{service.description}</p>
+              <ul class="list-none space-y-2 w-full">
                 {service.features.map(feature => (
-                  <li class="mb-2">{feature}</li>
+                  <li class="flex items-center justify-center md:justify-start gap-2">
+                    <span class="text-primary text-lg">✓</span>
+                    <span>{feature}</span>
+                  </li>
                 ))}
               </ul>
             </div>
