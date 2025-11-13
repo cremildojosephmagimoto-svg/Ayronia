@@ -170,6 +170,26 @@ import Layout from '@layouts/Layout.astro';
     </div>
   </dialog>
 
+  <dialog id="otp-modal" class="modal">
+    <div class="modal-box">
+      <h3 class="font-bold text-lg mb-4">Verificação de Segurança</h3>
+      <p class="mb-4">Um código de verificação foi enviado para o seu celular. Insira-o abaixo para confirmar o pedido.</p>
+      <div class="form-control mb-4">
+        <label class="label">
+          <span class="label-text">Código OTP (6 dígitos)</span>
+        </label>
+        <input type="text" id="otp-input" placeholder="000000" class="input input-bordered" maxlength="6" />
+        <label class="label">
+          <span class="label-text-alt text-error" id="otp-error"></span>
+        </label>
+      </div>
+      <div class="modal-action">
+        <button class="btn btn-ghost" id="cancel-otp">Cancelar</button>
+        <button class="btn btn-primary" id="verify-otp">Verificar</button>
+      </div>
+    </div>
+  </dialog>
+
   <dialog id="success-modal" class="modal">
     <div class="modal-box text-center">
       <div class="text-6xl mb-4">✅</div>
@@ -253,10 +273,18 @@ import Layout from '@layouts/Layout.astro';
         (e.target as HTMLInputElement).value = value;
       });
 
-      document.getElementById('confirm-order')?.addEventListener('click', () => {
+      document.getElementById('confirm-order')?.addEventListener('click', async () => {
         const form = document.getElementById('checkout-form') as HTMLFormElement;
         if (!form.checkValidity()) {
           form.reportValidity();
+          return;
+        }
+
+        const phoneInput = document.querySelector('input[type="tel"]') as HTMLInputElement;
+        const phone = phoneInput?.value;
+
+        if (!phone) {
+          alert('Por favor, insira o seu número de telefone.');
           return;
         }
 
@@ -273,17 +301,85 @@ import Layout from '@layouts/Layout.astro';
           statusEl!.textContent = 'A processar pagamento com cartão...';
         }
 
-        setTimeout(() => {
+        try {
+          const response = await fetch('/api/send-otp', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ phone }),
+          });
+
+          const data = await response.json();
+
+          setTimeout(() => {
+            modal?.close();
+
+            if (data.success) {
+              const otpModal = document.getElementById('otp-modal') as HTMLDialogElement;
+              (otpModal as any).dataset.phone = phone;
+              (otpModal as any).dataset.otp = data.otp;
+              otpModal?.showModal();
+            } else {
+              alert('Erro ao enviar código OTP. Tente novamente.');
+            }
+          }, 2000);
+        } catch (error) {
           modal?.close();
-          
-          const orderNumber = 'AYR' + Math.floor(Math.random() * 1000000).toString().padStart(6, '0');
-          document.getElementById('order-number')!.textContent = orderNumber;
-          
-          localStorage.removeItem('cart');
-          
-          const successModal = document.getElementById('success-modal') as HTMLDialogElement;
-          successModal?.showModal();
-        }, 3000);
+          console.error('Error sending OTP:', error);
+          alert('Erro ao enviar código OTP. Tente novamente.');
+        }
+      });
+
+      document.getElementById('cancel-otp')?.addEventListener('click', () => {
+        const otpModal = document.getElementById('otp-modal') as HTMLDialogElement;
+        otpModal?.close();
+        document.getElementById('otp-input')!.value = '';
+        document.getElementById('otp-error')!.textContent = '';
+      });
+
+      document.getElementById('verify-otp')?.addEventListener('click', async () => {
+        const otpInput = document.getElementById('otp-input') as HTMLInputElement;
+        const otpError = document.getElementById('otp-error');
+        const otpModal = document.getElementById('otp-modal') as HTMLDialogElement;
+        const code = otpInput.value;
+        const phone = (otpModal as any).dataset.phone;
+
+        if (!code || code.length !== 6) {
+          otpError!.textContent = 'Por favor, insira um código de 6 dígitos.';
+          return;
+        }
+
+        try {
+          const response = await fetch('/api/verify-otp', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ phone, code }),
+          });
+
+          const data = await response.json();
+
+          if (data.success) {
+            otpModal?.close();
+            otpInput.value = '';
+            otpError!.textContent = '';
+
+            const orderNumber = 'AYR' + Math.floor(Math.random() * 1000000).toString().padStart(6, '0');
+            document.getElementById('order-number')!.textContent = orderNumber;
+
+            localStorage.removeItem('cart');
+
+            const successModal = document.getElementById('success-modal') as HTMLDialogElement;
+            successModal?.showModal();
+          } else {
+            otpError!.textContent = data.error || 'Código OTP inválido. Tente novamente.';
+          }
+        } catch (error) {
+          console.error('Error verifying OTP:', error);
+          otpError!.textContent = 'Erro ao verificar código OTP. Tente novamente.';
+        }
       });
     });
   </script>
