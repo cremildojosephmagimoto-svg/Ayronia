@@ -107,7 +107,7 @@ Método de Pagamento: ${orderData.paymentMethod === "mpesa" ? "M-Pesa" : "Cartã
         success: true,
         orderNumber: orderData.orderNumber,
         whatsappUrl: `https://wa.me/258${orderData.customerPhone.replace(/\D/g, "").slice(-9)}?text=${whatsappMessage}`,
-        whatsappAdminUrl: `https://wa.me/258842612828?text=${whatsappMessage}`,
+        whatsappAdminUrl: `https://wa.me/258849220000?text=${whatsappMessage}`,
         emailSent,
         emailError,
       }),
