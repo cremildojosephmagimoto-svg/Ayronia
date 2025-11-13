@@ -261,11 +261,22 @@ import Layout from '@layouts/Layout.astro';
           return;
         }
 
+        const nameInput = form.querySelector('input[type="text"]') as HTMLInputElement;
         const phoneInput = document.querySelector('input[type="tel"]') as HTMLInputElement;
-        const phone = phoneInput?.value;
+        const emailInput = document.querySelector('input[type="email"]') as HTMLInputElement;
+        const addressInput = form.querySelector('textarea') as HTMLTextAreaElement;
+        const cityInput = form.querySelectorAll('input[type="text"]')[1] as HTMLInputElement;
+        const postalCodeInput = form.querySelectorAll('input[type="text"]')[2] as HTMLInputElement;
 
-        if (!phone) {
-          alert('Por favor, insira o seu número de telefone.');
+        const customerName = nameInput?.value;
+        const phone = phoneInput?.value;
+        const email = emailInput?.value;
+        const address = addressInput?.value;
+        const city = cityInput?.value;
+        const postalCode = postalCodeInput?.value || '';
+
+        if (!phone || !customerName || !email || !address || !city) {
+          alert('Por favor, preencha todos os campos obrigatórios.');
           return;
         }
 
@@ -282,17 +293,56 @@ import Layout from '@layouts/Layout.astro';
           statusEl!.textContent = 'A processar pagamento com cartão...';
         }
 
-        setTimeout(() => {
+        const cart: CartItem[] = JSON.parse(localStorage.getItem('cart') || '[]');
+        const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        const deliveryFee = 50;
+        const total = subtotal + deliveryFee;
+
+        const orderNumber = 'AYR' + Math.floor(Math.random() * 1000000).toString().padStart(6, '0');
+
+        try {
+          const response = await fetch('/api/send-order', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              orderNumber,
+              customerName,
+              customerEmail: email,
+              customerPhone: phone,
+              address,
+              city,
+              postalCode,
+              items: cart,
+              subtotal,
+              deliveryFee,
+              total,
+              paymentMethod,
+            }),
+          });
+
+          const result = await response.json();
+
+          if (result.success) {
+            if (result.whatsappAdminUrl) {
+              window.open(result.whatsappAdminUrl, '_blank');
+            }
+
+            modal?.close();
+            document.getElementById('order-number')!.textContent = orderNumber;
+            localStorage.removeItem('cart');
+
+            const successModal = document.getElementById('success-modal') as HTMLDialogElement;
+            successModal?.showModal();
+          } else {
+            throw new Error(result.error || 'Erro ao processar pedido');
+          }
+        } catch (error) {
           modal?.close();
-
-          const orderNumber = 'AYR' + Math.floor(Math.random() * 1000000).toString().padStart(6, '0');
-          document.getElementById('order-number')!.textContent = orderNumber;
-
-          localStorage.removeItem('cart');
-
-          const successModal = document.getElementById('success-modal') as HTMLDialogElement;
-          successModal?.showModal();
-        }, 2000);
+          alert('Ocorreu um erro ao processar o pedido. Por favor, tente novamente ou contacte-nos.');
+          console.error('Order processing error:', error);
+        }
       });
 
     });
