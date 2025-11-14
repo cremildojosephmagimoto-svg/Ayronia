@@ -46,23 +46,21 @@ const categories = ['Todos', 'Alimentar', 'Talho', 'Congelados', 'Limpeza'];
         </div>
       </button>
 
-      <div id="produtos-section" class="flex gap-6">
-        <aside class="w-64 flex-shrink-0 sticky top-4 h-fit">
-          <div class="bg-base-100/30 backdrop-blur-sm rounded-lg p-4">
-            <div class="flex flex-col gap-2">
-              {categories.map(cat => (
-                <button 
-                  class="btn btn-ghost category-filter justify-start text-base-content/60 hover:text-base-content hover:bg-base-200/50" 
-                  data-category={cat}
-                >
-                  {cat}
-                </button>
-              ))}
-            </div>
-          </div>
-        </aside>
+      <div class="mb-6">
+        <div class="flex gap-2 overflow-x-auto pb-2 scrollbar-hide justify-center md:justify-start">
+          {categories.map(cat => (
+            <button 
+              class="btn btn-sm category-filter flex-shrink-0" 
+              data-category={cat}
+            >
+              {cat}
+            </button>
+          ))}
+        </div>
+      </div>
 
-        <div class="flex-1">
+      <div id="produtos-section">
+        <div class="w-full">
           <div class="mb-8">
             <div class="form-control">
               <div class="input-group">
@@ -81,39 +79,41 @@ const categories = ['Todos', 'Alimentar', 'Talho', 'Congelados', 'Limpeza'];
             </div>
           </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="products-grid">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6" id="products-grid">
           {products.map(product => (
             <div class="card bg-base-100 shadow-xl product-card fade-in-up" data-category={product.category}>
-              <figure class="bg-gradient-to-br from-base-200 to-base-300 h-56 flex items-center justify-center relative overflow-hidden">
+              <figure class="bg-gradient-to-br from-base-200 to-base-300 h-40 md:h-56 flex items-center justify-center relative overflow-hidden">
                 <div class="absolute inset-0 bg-base-300/20"></div>
-                <span class="text-7xl relative z-10 transform hover:scale-110 transition-transform duration-300">{
+                <span class="text-5xl md:text-7xl relative z-10 transform hover:scale-110 transition-transform duration-300">{
                   product.category === 'Alimentar' ? '🌾' :
                   product.category === 'Talho' ? '🥩' :
                   product.category === 'Congelados' ? '❄️' :
                   '🧼'
                 }</span>
               </figure>
-              <div class="card-body mobile-center">
-                <h2 class="card-title text-lg justify-center md:justify-start">
+              <div class="card-body p-3 md:p-6 mobile-center">
+                <h2 class="card-title text-base md:text-lg justify-center md:justify-start">
                   {product.name}
                 </h2>
-                <p class="text-sm text-base-content/70">{product.description}</p>
-                <div class="flex flex-col md:flex-row justify-between items-center gap-4 mt-4">
-                  <span class="text-2xl font-bold text-primary">{product.price} MT</span>
-                  <div class="flex gap-2">
+                <p class="text-xs md:text-sm text-base-content/70 line-clamp-2">{product.description}</p>
+                <div class="flex flex-col md:flex-row justify-between items-center gap-2 md:gap-4 mt-2 md:mt-4">
+                  <span class="text-xl md:text-2xl font-bold text-primary">{product.price} MT</span>
+                  <div class="flex gap-2 w-full md:w-auto">
                     <button 
-                      class="btn btn-outline btn-sm open-product-modal"
+                      class="btn btn-outline btn-xs md:btn-sm flex-1 md:flex-none open-product-modal"
                       data-product={JSON.stringify(product)}
                     >
-                      Ver detalhes
+                      <span class="hidden md:inline">Ver detalhes</span>
+                      <span class="md:hidden">Detalhes</span>
                     </button>
                     <button 
-                      class="btn btn-primary btn-sm add-to-cart-direct"
+                      class="btn btn-primary btn-xs md:btn-sm flex-1 md:flex-none add-to-cart-direct"
                       data-product={JSON.stringify(product)}
                     >
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 md:h-4 md:w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
                       </svg>
+                      <span class="hidden md:inline ml-1">Adicionar</span>
                     </button>
                   </div>
                 </div>
