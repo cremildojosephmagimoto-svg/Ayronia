@@ -8,22 +8,21 @@ interface Product {
   category: string;
   image: string;
   description: string;
-  verified?: boolean;
 }
 
 const products: Product[] = [
-  { id: '1', name: 'Arroz Carolino 1kg', price: 85, category: 'Alimentar', image: '/images/arroz.jpg', description: 'Arroz de qualidade premium', verified: true },
-  { id: '2', name: 'Feijão Manteiga 500g', price: 120, category: 'Alimentar', image: '/images/feijao.jpg', description: 'Feijão manteiga selecionado', verified: true },
-  { id: '3', name: 'Óleo Vegetal 750ml', price: 150, category: 'Alimentar', image: '/images/oleo.jpg', description: 'Óleo vegetal refinado', verified: false },
-  { id: '4', name: 'Frango Inteiro 1.5kg', price: 450, category: 'Talho', image: '/images/frango.jpg', description: 'Frango fresco do dia', verified: true },
-  { id: '5', name: 'Carne de Vaca 1kg', price: 650, category: 'Talho', image: '/images/vaca.jpg', description: 'Carne de vaca premium', verified: true },
-  { id: '6', name: 'Costeletas de Porco 800g', price: 380, category: 'Talho', image: '/images/costeletas.jpg', description: 'Costeletas frescas', verified: false },
-  { id: '7', name: 'Peixe Congelado 600g', price: 320, category: 'Congelados', image: '/images/peixe.jpg', description: 'Peixe congelado premium', verified: true },
-  { id: '8', name: 'Batatas Fritas 1kg', price: 180, category: 'Congelados', image: '/images/batatas.jpg', description: 'Batatas pré-fritas congeladas', verified: false },
-  { id: '9', name: 'Vegetais Mix 500g', price: 140, category: 'Congelados', image: '/images/vegetais.jpg', description: 'Mix de vegetais congelados', verified: true },
-  { id: '10', name: 'Detergente 500ml', price: 95, category: 'Limpeza', image: '/images/detergente.jpg', description: 'Detergente multiusos', verified: false },
-  { id: '11', name: 'Sabão em Pó 1kg', price: 120, category: 'Limpeza', image: '/images/sabao.jpg', description: 'Sabão para roupa', verified: true },
-  { id: '12', name: 'Desinfetante 1L', price: 150, category: 'Limpeza', image: '/images/desinfetante.jpg', description: 'Desinfetante antibacteriano', verified: false }
+  { id: '1', name: 'Arroz Carolino 1kg', price: 85, category: 'Alimentar', image: '/images/arroz.jpg', description: 'Arroz de qualidade premium' },
+  { id: '2', name: 'Feijão Manteiga 500g', price: 120, category: 'Alimentar', image: '/images/feijao.jpg', description: 'Feijão manteiga selecionado' },
+  { id: '3', name: 'Óleo Vegetal 750ml', price: 150, category: 'Alimentar', image: '/images/oleo.jpg', description: 'Óleo vegetal refinado' },
+  { id: '4', name: 'Frango Inteiro 1.5kg', price: 450, category: 'Talho', image: '/images/frango.jpg', description: 'Frango fresco do dia' },
+  { id: '5', name: 'Carne de Vaca 1kg', price: 650, category: 'Talho', image: '/images/vaca.jpg', description: 'Carne de vaca premium' },
+  { id: '6', name: 'Costeletas de Porco 800g', price: 380, category: 'Talho', image: '/images/costeletas.jpg', description: 'Costeletas frescas' },
+  { id: '7', name: 'Peixe Congelado 600g', price: 320, category: 'Congelados', image: '/images/peixe.jpg', description: 'Peixe congelado premium' },
+  { id: '8', name: 'Batatas Fritas 1kg', price: 180, category: 'Congelados', image: '/images/batatas.jpg', description: 'Batatas pré-fritas congeladas' },
+  { id: '9', name: 'Vegetais Mix 500g', price: 140, category: 'Congelados', image: '/images/vegetais.jpg', description: 'Mix de vegetais congelados' },
+  { id: '10', name: 'Detergente 500ml', price: 95, category: 'Limpeza', image: '/images/detergente.jpg', description: 'Detergente multiusos' },
+  { id: '11', name: 'Sabão em Pó 1kg', price: 120, category: 'Limpeza', image: '/images/sabao.jpg', description: 'Sabão para roupa' },
+  { id: '12', name: 'Desinfetante 1L', price: 150, category: 'Limpeza', image: '/images/desinfetante.jpg', description: 'Desinfetante antibacteriano' }
 ];
 
 const categories = ['Todos', 'Alimentar', 'Talho', 'Congelados', 'Limpeza'];
@@ -79,7 +78,7 @@ const categories = ['Todos', 'Alimentar', 'Talho', 'Congelados', 'Limpeza'];
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" id="products-grid">
         {products.map(product => (
-          <div class="card bg-base-100 shadow-xl product-card fade-in-up" data-category={product.category} data-verified={product.verified}>
+          <div class="card bg-base-100 shadow-xl product-card fade-in-up" data-category={product.category}>
             <figure class="bg-gradient-to-br from-base-200 to-base-300 h-56 flex items-center justify-center relative overflow-hidden">
               <div class="absolute inset-0 bg-base-300/20"></div>
               <span class="text-7xl relative z-10 transform hover:scale-110 transition-transform duration-300">{
@@ -92,19 +91,8 @@ const categories = ['Todos', 'Alimentar', 'Talho', 'Congelados', 'Limpeza'];
             <div class="card-body mobile-center">
               <h2 class="card-title text-lg justify-center md:justify-start">
                 {product.name}
-                {product.verified && (
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-success" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-                  </svg>
-                )}
               </h2>
               <p class="text-sm text-base-content/70">{product.description}</p>
-              <div class="flex gap-2">
-                <div class="badge badge-primary">{product.category}</div>
-                {product.verified && (
-                  <div class="badge badge-success">Verificado</div>
-                )}
-              </div>
               <div class="flex flex-col md:flex-row justify-between items-center gap-4 mt-4">
                 <span class="text-2xl font-bold text-primary">{product.price} MT</span>
                 <div class="flex gap-2">
@@ -112,7 +100,7 @@ const categories = ['Todos', 'Alimentar', 'Talho', 'Congelados', 'Limpeza'];
                     class="btn btn-outline btn-sm open-product-modal"
                     data-product={JSON.stringify(product)}
                   >
-                    Quick view
+                    Ver detalhes
                   </button>
                   <button 
                     class="btn btn-primary btn-sm add-to-cart-direct"
@@ -311,7 +299,6 @@ const categories = ['Todos', 'Alimentar', 'Talho', 'Congelados', 'Limpeza'];
             </div>
             <div class="flex-1">
               <h3 class="font-bold text-lg">${item.name}</h3>
-              <p class="text-sm text-gray-600">${item.category}</p>
               <p class="text-lg font-bold mt-2">${item.price} MT</p>
             </div>
             <div class="flex flex-col items-end justify-between">
@@ -438,10 +425,7 @@ const categories = ['Todos', 'Alimentar', 'Talho', 'Congelados', 'Limpeza'];
         document.getElementById('modal-product-price')!.textContent = `${product.price} MT`;
         
         const badgesDiv = document.getElementById('modal-product-badges')!;
-        badgesDiv.innerHTML = `
-          <div class="badge badge-primary badge-lg">${product.category}</div>
-          ${product.verified ? '<div class="badge badge-success badge-lg">Verificado</div>' : ''}
-        `;
+        badgesDiv.innerHTML = ``;
         
         updateModalTotalPrice();
         productModal?.classList.add('modal-open');
