@@ -27,6 +27,8 @@
     "devDependencies": {
         "@sanity/export": "^3.38.1",
         "@sanity/import": "^3.37.4",
+        "@stackbit/cms-sanity": "^0.2.90",
+        "@stackbit/types": "^2.1.14",
         "configstore": "7.0.0",
         "daisyui": "^5.0.0"
     }
