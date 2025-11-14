@@ -90,19 +90,25 @@ Then you can run the Astro.js development server in root directory:
 npm run dev
 ```
 
-Install Netlify Visual Editor CLI:
+Install Netlify Visual Editor CLI globally:
 
 ```txt
 npm install -g @stackbit/cli
 ```
 
-And the Stackbit development server.
+The Visual Editor packages are already installed as dev dependencies in the project:
+- `@stackbit/types`
+- `@stackbit/cms-sanity`
+
+Start the Netlify Visual Editor development server:
 
 ```txt
 stackbit dev
 ```
 
 This outputs your own Netlify Visual Editor URL. Open this, register or sign in, and you will be directed to Netlify Visual Editor for your new project.
+
+The project includes a `stackbit.config.ts` file that configures the Visual Editor to work with Astro and Sanity.
 
 ## Next Steps
 
