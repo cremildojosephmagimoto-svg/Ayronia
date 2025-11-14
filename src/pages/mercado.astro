@@ -8,21 +8,22 @@ interface Product {
   category: string;
   image: string;
   description: string;
+  verified?: boolean;
 }
 
 const products: Product[] = [
-  { id: '1', name: 'Arroz Carolino 1kg', price: 85, category: 'Alimentar', image: '/images/arroz.jpg', description: 'Arroz de qualidade premium' },
-  { id: '2', name: 'Feijão Manteiga 500g', price: 120, category: 'Alimentar', image: '/images/feijao.jpg', description: 'Feijão manteiga selecionado' },
-  { id: '3', name: 'Óleo Vegetal 750ml', price: 150, category: 'Alimentar', image: '/images/oleo.jpg', description: 'Óleo vegetal refinado' },
-  { id: '4', name: 'Frango Inteiro 1.5kg', price: 450, category: 'Talho', image: '/images/frango.jpg', description: 'Frango fresco do dia' },
-  { id: '5', name: 'Carne de Vaca 1kg', price: 650, category: 'Talho', image: '/images/vaca.jpg', description: 'Carne de vaca premium' },
-  { id: '6', name: 'Costeletas de Porco 800g', price: 380, category: 'Talho', image: '/images/costeletas.jpg', description: 'Costeletas frescas' },
-  { id: '7', name: 'Peixe Congelado 600g', price: 320, category: 'Congelados', image: '/images/peixe.jpg', description: 'Peixe congelado premium' },
-  { id: '8', name: 'Batatas Fritas 1kg', price: 180, category: 'Congelados', image: '/images/batatas.jpg', description: 'Batatas pré-fritas congeladas' },
-  { id: '9', name: 'Vegetais Mix 500g', price: 140, category: 'Congelados', image: '/images/vegetais.jpg', description: 'Mix de vegetais congelados' },
-  { id: '10', name: 'Detergente 500ml', price: 95, category: 'Limpeza', image: '/images/detergente.jpg', description: 'Detergente multiusos' },
-  { id: '11', name: 'Sabão em Pó 1kg', price: 120, category: 'Limpeza', image: '/images/sabao.jpg', description: 'Sabão para roupa' },
-  { id: '12', name: 'Desinfetante 1L', price: 150, category: 'Limpeza', image: '/images/desinfetante.jpg', description: 'Desinfetante antibacteriano' }
+  { id: '1', name: 'Arroz Carolino 1kg', price: 85, category: 'Alimentar', image: '/images/arroz.jpg', description: 'Arroz de qualidade premium', verified: true },
+  { id: '2', name: 'Feijão Manteiga 500g', price: 120, category: 'Alimentar', image: '/images/feijao.jpg', description: 'Feijão manteiga selecionado', verified: true },
+  { id: '3', name: 'Óleo Vegetal 750ml', price: 150, category: 'Alimentar', image: '/images/oleo.jpg', description: 'Óleo vegetal refinado', verified: false },
+  { id: '4', name: 'Frango Inteiro 1.5kg', price: 450, category: 'Talho', image: '/images/frango.jpg', description: 'Frango fresco do dia', verified: true },
+  { id: '5', name: 'Carne de Vaca 1kg', price: 650, category: 'Talho', image: '/images/vaca.jpg', description: 'Carne de vaca premium', verified: true },
+  { id: '6', name: 'Costeletas de Porco 800g', price: 380, category: 'Talho', image: '/images/costeletas.jpg', description: 'Costeletas frescas', verified: false },
+  { id: '7', name: 'Peixe Congelado 600g', price: 320, category: 'Congelados', image: '/images/peixe.jpg', description: 'Peixe congelado premium', verified: true },
+  { id: '8', name: 'Batatas Fritas 1kg', price: 180, category: 'Congelados', image: '/images/batatas.jpg', description: 'Batatas pré-fritas congeladas', verified: false },
+  { id: '9', name: 'Vegetais Mix 500g', price: 140, category: 'Congelados', image: '/images/vegetais.jpg', description: 'Mix de vegetais congelados', verified: true },
+  { id: '10', name: 'Detergente 500ml', price: 95, category: 'Limpeza', image: '/images/detergente.jpg', description: 'Detergente multiusos', verified: false },
+  { id: '11', name: 'Sabão em Pó 1kg', price: 120, category: 'Limpeza', image: '/images/sabao.jpg', description: 'Sabão para roupa', verified: true },
+  { id: '12', name: 'Desinfetante 1L', price: 150, category: 'Limpeza', image: '/images/desinfetante.jpg', description: 'Desinfetante antibacteriano', verified: false }
 ];
 
 const categories = ['Todos', 'Alimentar', 'Talho', 'Congelados', 'Limpeza'];
@@ -78,7 +79,7 @@ const categories = ['Todos', 'Alimentar', 'Talho', 'Congelados', 'Limpeza'];
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" id="products-grid">
         {products.map(product => (
-          <div class="card bg-base-100 shadow-xl product-card fade-in-up" data-category={product.category}>
+          <div class="card bg-base-100 shadow-xl product-card fade-in-up" data-category={product.category} data-verified={product.verified}>
             <figure class="bg-gradient-to-br from-base-200 to-base-300 h-56 flex items-center justify-center relative overflow-hidden">
               <div class="absolute inset-0 bg-base-300/20"></div>
               <span class="text-7xl relative z-10 transform hover:scale-110 transition-transform duration-300">{
@@ -89,22 +90,95 @@ const categories = ['Todos', 'Alimentar', 'Talho', 'Congelados', 'Limpeza'];
               }</span>
             </figure>
             <div class="card-body mobile-center">
-              <h2 class="card-title text-lg justify-center md:justify-start">{product.name}</h2>
+              <h2 class="card-title text-lg justify-center md:justify-start">
+                {product.name}
+                {product.verified && (
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-success" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                  </svg>
+                )}
+              </h2>
               <p class="text-sm text-base-content/70">{product.description}</p>
-              <div class="badge badge-primary">{product.category}</div>
+              <div class="flex gap-2">
+                <div class="badge badge-primary">{product.category}</div>
+                {product.verified && (
+                  <div class="badge badge-success">Verificado</div>
+                )}
+              </div>
               <div class="flex flex-col md:flex-row justify-between items-center gap-4 mt-4">
                 <span class="text-2xl font-bold text-primary">{product.price} MT</span>
-                <button 
-                  class="btn btn-primary btn-sm add-to-cart"
-                  data-product={JSON.stringify(product)}
-                >
-                  Adicionar
-                </button>
+                <div class="flex gap-2">
+                  <button 
+                    class="btn btn-outline btn-sm open-product-modal"
+                    data-product={JSON.stringify(product)}
+                  >
+                    Quick view
+                  </button>
+                  <button 
+                    class="btn btn-primary btn-sm add-to-cart-direct"
+                    data-product={JSON.stringify(product)}
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
         ))}
         </div>
+      </div>
+
+      <div id="product-modal" class="modal">
+        <div class="modal-box w-11/12 max-w-3xl">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="font-bold text-2xl" id="modal-product-name"></h3>
+            <button class="btn btn-sm btn-circle btn-ghost" id="close-product-modal">✕</button>
+          </div>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="flex flex-col items-center">
+              <figure class="bg-gradient-to-br from-base-200 to-base-300 w-full h-64 flex items-center justify-center relative overflow-hidden rounded-lg shadow-lg">
+                <div class="absolute inset-0 bg-base-300/20"></div>
+                <span class="text-9xl relative z-10" id="modal-product-emoji"></span>
+              </figure>
+              <div class="mt-4 flex gap-2" id="modal-product-badges"></div>
+            </div>
+            
+            <div class="flex flex-col justify-between">
+              <div>
+                <p class="text-base-content/70 mb-4" id="modal-product-description"></p>
+                <p class="text-3xl font-bold text-primary mb-6" id="modal-product-price"></p>
+              </div>
+              
+              <div class="space-y-4">
+                <div class="form-control">
+                  <label class="label">
+                    <span class="label-text font-semibold">Quantidade</span>
+                  </label>
+                  <div class="flex items-center gap-4">
+                    <button class="btn btn-circle btn-lg" id="modal-decrease-qty">-</button>
+                    <input 
+                      type="number" 
+                      class="input input-bordered w-24 text-center text-xl font-bold" 
+                      id="modal-quantity" 
+                      value="1" 
+                      min="1"
+                      readonly
+                    />
+                    <button class="btn btn-circle btn-lg" id="modal-increase-qty">+</button>
+                  </div>
+                </div>
+                
+                <button class="btn btn-primary btn-block btn-lg" id="modal-confirm-add">
+                  Confirmar - <span id="modal-total-price"></span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-backdrop" id="product-modal-backdrop"></div>
       </div>
 
       <div id="carrinho-modal" class="modal">
@@ -334,15 +408,129 @@ const categories = ['Todos', 'Alimentar', 'Talho', 'Congelados', 'Limpeza'];
         });
       });
 
-      const addToCartButtons = document.querySelectorAll('.add-to-cart');
-      addToCartButtons.forEach(button => {
+      const productModal = document.getElementById('product-modal');
+      const closeProductModal = document.getElementById('close-product-modal');
+      const productModalBackdrop = document.getElementById('product-modal-backdrop');
+      const modalQuantity = document.getElementById('modal-quantity') as HTMLInputElement;
+      const modalIncreaseQty = document.getElementById('modal-increase-qty');
+      const modalDecreaseQty = document.getElementById('modal-decrease-qty');
+      const modalConfirmAdd = document.getElementById('modal-confirm-add');
+      
+      let currentProduct: any = null;
+      
+      function getEmojiForCategory(category: string): string {
+        switch(category) {
+          case 'Alimentar': return '🌾';
+          case 'Talho': return '🥩';
+          case 'Congelados': return '❄️';
+          case 'Limpeza': return '🧼';
+          default: return '📦';
+        }
+      }
+      
+      function openProductModal(product: any) {
+        currentProduct = product;
+        modalQuantity!.value = '1';
+        
+        document.getElementById('modal-product-name')!.textContent = product.name;
+        document.getElementById('modal-product-emoji')!.textContent = getEmojiForCategory(product.category);
+        document.getElementById('modal-product-description')!.textContent = product.description;
+        document.getElementById('modal-product-price')!.textContent = `${product.price} MT`;
+        
+        const badgesDiv = document.getElementById('modal-product-badges')!;
+        badgesDiv.innerHTML = `
+          <div class="badge badge-primary badge-lg">${product.category}</div>
+          ${product.verified ? '<div class="badge badge-success badge-lg">Verificado</div>' : ''}
+        `;
+        
+        updateModalTotalPrice();
+        productModal?.classList.add('modal-open');
+      }
+      
+      function closeProductModalFunc() {
+        productModal?.classList.remove('modal-open');
+        currentProduct = null;
+      }
+      
+      function updateModalTotalPrice() {
+        if (!currentProduct || !modalQuantity) return;
+        const quantity = parseInt(modalQuantity.value);
+        const total = currentProduct.price * quantity;
+        document.getElementById('modal-total-price')!.textContent = `${total} MT`;
+      }
+      
+      closeProductModal?.addEventListener('click', closeProductModalFunc);
+      productModalBackdrop?.addEventListener('click', closeProductModalFunc);
+      
+      modalIncreaseQty?.addEventListener('click', () => {
+        if (modalQuantity) {
+          const currentValue = parseInt(modalQuantity.value);
+          modalQuantity.value = (currentValue + 1).toString();
+          updateModalTotalPrice();
+        }
+      });
+      
+      modalDecreaseQty?.addEventListener('click', () => {
+        if (modalQuantity) {
+          const currentValue = parseInt(modalQuantity.value);
+          if (currentValue > 1) {
+            modalQuantity.value = (currentValue - 1).toString();
+            updateModalTotalPrice();
+          }
+        }
+      });
+      
+      modalConfirmAdd?.addEventListener('click', () => {
+        if (!currentProduct || !modalQuantity) return;
+        
+        const quantity = parseInt(modalQuantity.value);
+        let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+        
+        const existingItem = cart.find((item: any) => item.id === currentProduct.id);
+        if (existingItem) {
+          existingItem.quantity += quantity;
+        } else {
+          cart.push({ ...currentProduct, quantity });
+        }
+        
+        localStorage.setItem('cart', JSON.stringify(cart));
+        updateCartCount();
+        
+        closeProductModalFunc();
+        
+        const toast = document.createElement('div');
+        toast.className = 'alert alert-success fixed top-4 right-4 w-auto z-[100] shadow-lg';
+        toast.innerHTML = `
+          <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+          <span>${quantity}x ${currentProduct.name} adicionado ao carrinho!</span>
+        `;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
+      });
+      
+      const openProductModalButtons = document.querySelectorAll('.open-product-modal');
+      openProductModalButtons.forEach(button => {
         button.addEventListener('click', (e) => {
           const productData = (e.target as HTMLElement).dataset.product;
           if (productData) {
             const product = JSON.parse(productData);
-            let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+            openProductModal(product);
+          }
+        });
+      });
+
+      const addToCartDirectButtons = document.querySelectorAll('.add-to-cart-direct');
+      addToCartDirectButtons.forEach(button => {
+        button.addEventListener('click', (e) => {
+          const target = e.target as HTMLElement;
+          const buttonElement = target.closest('button') as HTMLElement;
+          const productData = buttonElement?.dataset.product;
+          if (productData) {
+            const product = JSON.parse(productData);
             
+            let cart = JSON.parse(localStorage.getItem('cart') || '[]');
             const existingItem = cart.find((item: any) => item.id === product.id);
+            
             if (existingItem) {
               existingItem.quantity += 1;
             } else {
@@ -350,14 +538,16 @@ const categories = ['Todos', 'Alimentar', 'Talho', 'Congelados', 'Limpeza'];
             }
             
             localStorage.setItem('cart', JSON.stringify(cart));
-            
-            const btn = e.target as HTMLElement;
-            btn.textContent = 'Adicionado!';
-            setTimeout(() => {
-              btn.textContent = 'Adicionar';
-            }, 1000);
-            
             updateCartCount();
+            
+            const toast = document.createElement('div');
+            toast.className = 'alert alert-success fixed top-4 right-4 w-auto z-[100] shadow-lg';
+            toast.innerHTML = `
+              <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+              <span>${product.name} adicionado ao carrinho!</span>
+            `;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
           }
         });
       });
