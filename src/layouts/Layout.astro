@@ -77,10 +77,5 @@ function formatCanonicalURL(url: string | URL) {
         <slot />
         <Footer {...configData.footer} data-sb-field-path={`${configData._id}:footer`} />
         <WhatsAppButton />
-        <script is:inline>
-            window.addEventListener('stackbitObjectsChanged', () => {
-                window.location.reload();
-            });
-        </script>
     </body>
 </html>
