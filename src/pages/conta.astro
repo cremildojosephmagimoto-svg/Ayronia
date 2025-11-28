@@ -31,10 +31,28 @@ import Layout from '@layouts/Layout.astro';
           <div>
             <h1 class="text-4xl font-bold">Olá, <span id="user-name"></span>!</h1>
             <p class="text-gray-600 mt-2">Bem-vindo à sua conta Ayronia</p>
+            <div class="mt-2">
+              <span id="user-role-badge" class="badge badge-lg"></span>
+            </div>
           </div>
           <button id="logout-btn" class="btn btn-outline btn-error">
             Terminar Sessão
           </button>
+        </div>
+
+        <!-- Role-based navigation -->
+        <div id="role-navigation" class="mb-8 hidden">
+          <div class="flex flex-wrap gap-3">
+            <a id="nav-admin" href="/admin" class="btn btn-error hidden">
+              ⚙️ Painel Admin
+            </a>
+            <a id="nav-supervisor" href="/supervisor" class="btn btn-secondary hidden">
+              📋 Painel Supervisor
+            </a>
+            <a id="nav-entregador" href="/entregador" class="btn btn-accent hidden">
+              🚚 Painel Entregador
+            </a>
+          </div>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -57,6 +75,10 @@ import Layout from '@layouts/Layout.astro';
                 <div>
                   <p class="text-sm text-gray-600">Telefone</p>
                   <p class="font-bold" id="profile-phone"></p>
+                </div>
+                <div>
+                  <p class="text-sm text-gray-600">Perfil</p>
+                  <p class="font-bold" id="profile-role"></p>
                 </div>
               </div>
             </div>
@@ -131,12 +153,29 @@ import Layout from '@layouts/Layout.astro';
   </div>
 
   <script>
+    type UserRole = 'cliente' | 'administrador' | 'supervisor' | 'entregador';
+
     interface User {
       id: string;
       name: string;
       email: string;
       phone?: string;
+      role?: UserRole;
     }
+
+    const ROLE_DISPLAY_NAMES: Record<UserRole, string> = {
+      cliente: 'Cliente',
+      administrador: 'Administrador',
+      supervisor: 'Supervisor',
+      entregador: 'Entregador',
+    };
+
+    const ROLE_BADGE_CLASSES: Record<UserRole, string> = {
+      cliente: 'badge-primary',
+      administrador: 'badge-error',
+      supervisor: 'badge-secondary',
+      entregador: 'badge-accent',
+    };
 
     async function checkAuthStatus(): Promise<User | null> {
       const sessionToken = localStorage.getItem('sessionToken');
@@ -190,6 +229,27 @@ import Layout from '@layouts/Layout.astro';
       window.location.href = '/login';
     }
 
+    function setupRoleNavigation(role: UserRole) {
+      const roleNav = document.getElementById('role-navigation');
+      const navAdmin = document.getElementById('nav-admin');
+      const navSupervisor = document.getElementById('nav-supervisor');
+      const navEntregador = document.getElementById('nav-entregador');
+
+      // Show role-based navigation
+      if (role === 'administrador') {
+        roleNav?.classList.remove('hidden');
+        navAdmin?.classList.remove('hidden');
+        navSupervisor?.classList.remove('hidden');
+        navEntregador?.classList.remove('hidden');
+      } else if (role === 'supervisor') {
+        roleNav?.classList.remove('hidden');
+        navSupervisor?.classList.remove('hidden');
+      } else if (role === 'entregador') {
+        roleNav?.classList.remove('hidden');
+        navEntregador?.classList.remove('hidden');
+      }
+    }
+
     document.addEventListener('DOMContentLoaded', async () => {
       const loadingState = document.getElementById('loading-state');
       const notLoggedIn = document.getElementById('not-logged-in');
@@ -205,10 +265,21 @@ import Layout from '@layouts/Layout.astro';
 
         // Populate user data
         const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
+        const userRole: UserRole = user.role || storedUser.role || 'cliente';
+
         document.getElementById('user-name')!.textContent = user.name.split(' ')[0];
         document.getElementById('profile-name')!.textContent = user.name;
         document.getElementById('profile-email')!.textContent = user.email;
         document.getElementById('profile-phone')!.textContent = storedUser.phone || 'Não definido';
+        document.getElementById('profile-role')!.textContent = ROLE_DISPLAY_NAMES[userRole] || 'Cliente';
+
+        // Setup role badge
+        const roleBadge = document.getElementById('user-role-badge')!;
+        roleBadge.textContent = ROLE_DISPLAY_NAMES[userRole] || 'Cliente';
+        roleBadge.classList.add(ROLE_BADGE_CLASSES[userRole] || 'badge-primary');
+
+        // Setup role-based navigation
+        setupRoleNavigation(userRole);
       } else {
         // Show not logged in state
         notLoggedIn?.classList.remove('hidden');

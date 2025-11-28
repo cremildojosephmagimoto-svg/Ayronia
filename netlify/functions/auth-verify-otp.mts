@@ -1,34 +1,10 @@
 import type { Context, Config } from "@netlify/functions";
 import { getStore } from "@netlify/blobs";
+import type { User, Session, OTPData } from "./shared/types.mts";
 
 interface VerifyOTPData {
   email: string;
   code: string;
-}
-
-interface User {
-  id: string;
-  name: string;
-  email: string;
-  phone: string;
-  passwordHash: string;
-  verified: boolean;
-  createdAt: string;
-}
-
-interface OTPData {
-  code: string;
-  email: string;
-  expiresAt: number;
-  attempts: number;
-}
-
-interface Session {
-  userId: string;
-  email: string;
-  name: string;
-  createdAt: number;
-  expiresAt: number;
 }
 
 function generateSessionToken(): string {
@@ -150,6 +126,7 @@ export default async (req: Request, context: Context) => {
       userId: user.id,
       email: user.email,
       name: user.name,
+      role: user.role || 'cliente',
       createdAt: Date.now(),
       expiresAt: Date.now() + 7 * 24 * 60 * 60 * 1000,
     };
@@ -165,6 +142,7 @@ export default async (req: Request, context: Context) => {
           name: user.name,
           email: user.email,
           phone: user.phone,
+          role: user.role || 'cliente',
         },
         sessionToken,
       }),

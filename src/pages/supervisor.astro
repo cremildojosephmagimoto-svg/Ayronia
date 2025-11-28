@@ -1,0 +1,231 @@
+---
+import Layout from '@layouts/Layout.astro';
+---
+
+<Layout title="Supervisor" description="Painel do Supervisor Ayronia">
+  <div class="min-h-screen bg-base-200">
+    <div class="container mx-auto px-4 py-8">
+      <!-- Loading state -->
+      <div id="loading-state" class="flex items-center justify-center min-h-[60vh]">
+        <span class="loading loading-spinner loading-lg"></span>
+      </div>
+
+      <!-- Access denied state -->
+      <div id="access-denied" class="hidden flex items-center justify-center min-h-[60vh]">
+        <div class="card bg-base-100 shadow-xl w-full max-w-md">
+          <div class="card-body text-center">
+            <div class="text-6xl mb-4">🚫</div>
+            <h2 class="card-title justify-center text-2xl mb-4">Acesso Negado</h2>
+            <p class="mb-6">Não tem permissão para aceder a esta página. Apenas supervisores e administradores podem aceder.</p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+              <a href="/conta" class="btn btn-primary">Ir para Minha Conta</a>
+              <a href="/" class="btn btn-outline">Página Inicial</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Supervisor dashboard -->
+      <div id="supervisor-dashboard" class="hidden">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+          <div>
+            <h1 class="text-4xl font-bold">Painel do Supervisor</h1>
+            <p class="text-gray-600 mt-2">Gestão de pedidos e entregas</p>
+          </div>
+          <a href="/conta" class="btn btn-outline">
+            Voltar para Minha Conta
+          </a>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div class="card bg-base-100 shadow-xl">
+            <div class="card-body">
+              <div class="flex items-center gap-4">
+                <div class="text-4xl">📦</div>
+                <div>
+                  <h3 class="text-sm text-gray-600">Pedidos Pendentes</h3>
+                  <p class="text-3xl font-bold text-warning" id="pending-orders">-</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="card bg-base-100 shadow-xl">
+            <div class="card-body">
+              <div class="flex items-center gap-4">
+                <div class="text-4xl">🚚</div>
+                <div>
+                  <h3 class="text-sm text-gray-600">Em Entrega</h3>
+                  <p class="text-3xl font-bold text-info" id="in-delivery">-</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="card bg-base-100 shadow-xl">
+            <div class="card-body">
+              <div class="flex items-center gap-4">
+                <div class="text-4xl">✅</div>
+                <div>
+                  <h3 class="text-sm text-gray-600">Entregues Hoje</h3>
+                  <p class="text-3xl font-bold text-success" id="delivered-today">-</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Main Content Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <!-- Delivery Team -->
+          <div class="card bg-base-100 shadow-xl">
+            <div class="card-body">
+              <h2 class="card-title mb-4">
+                <span class="text-2xl mr-2">👥</span>
+                Equipa de Entrega
+              </h2>
+              <div id="delivery-team" class="space-y-3">
+                <div class="flex items-center justify-center py-8">
+                  <span class="loading loading-spinner loading-md"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Actions -->
+          <div class="card bg-base-100 shadow-xl">
+            <div class="card-body">
+              <h2 class="card-title mb-4">
+                <span class="text-2xl mr-2">⚡</span>
+                Ações Rápidas
+              </h2>
+              <div class="flex flex-col gap-3">
+                <a href="/mercado" class="btn btn-primary btn-outline w-full">
+                  🛒 Ver Mercado
+                </a>
+                <button class="btn btn-secondary btn-outline w-full" id="refresh-data">
+                  🔄 Atualizar Dados
+                </button>
+                <a href="/contactos" class="btn btn-accent btn-outline w-full">
+                  📞 Suporte
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="card bg-base-100 shadow-xl mt-6">
+          <div class="card-body">
+            <h2 class="card-title mb-4">
+              <span class="text-2xl mr-2">📋</span>
+              Actividade Recente
+            </h2>
+            <div class="overflow-x-auto">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Hora</th>
+                    <th>Tipo</th>
+                    <th>Descrição</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="activity-log">
+                  <tr>
+                    <td colspan="4" class="text-center py-8 text-gray-500">
+                      Nenhuma actividade recente
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    type UserRole = 'cliente' | 'administrador' | 'supervisor' | 'entregador';
+
+    interface User {
+      id: string;
+      name: string;
+      email: string;
+      role: UserRole;
+    }
+
+    async function checkAuthStatus(): Promise<User | null> {
+      const sessionToken = localStorage.getItem('sessionToken');
+      const storedUser = localStorage.getItem('user');
+
+      if (!sessionToken || !storedUser) {
+        return null;
+      }
+
+      try {
+        const response = await fetch('/api/auth/status', {
+          headers: { Authorization: `Bearer ${sessionToken}` },
+        });
+        const result = await response.json();
+        if (result.authenticated) {
+          return result.user;
+        }
+        localStorage.removeItem('sessionToken');
+        localStorage.removeItem('user');
+        return null;
+      } catch (error) {
+        console.error('Auth check error:', error);
+        return null;
+      }
+    }
+
+    async function loadDeliveryTeam() {
+      const teamContainer = document.getElementById('delivery-team')!;
+
+      // For now, show placeholder since we don't have orders API yet
+      teamContainer.innerHTML = `
+        <div class="alert alert-info">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current shrink-0 w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+          <span>A equipa de entrega será carregada quando o sistema de pedidos estiver configurado.</span>
+        </div>
+        <p class="text-sm text-gray-500 mt-2">
+          Os entregadores registados no sistema aparecerão aqui com o seu estado atual.
+        </p>
+      `;
+    }
+
+    function loadStats() {
+      // Placeholder stats - will be connected to real data when orders API exists
+      document.getElementById('pending-orders')!.textContent = '0';
+      document.getElementById('in-delivery')!.textContent = '0';
+      document.getElementById('delivered-today')!.textContent = '0';
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const loadingState = document.getElementById('loading-state');
+      const accessDenied = document.getElementById('access-denied');
+      const supervisorDashboard = document.getElementById('supervisor-dashboard');
+
+      const user = await checkAuthStatus();
+
+      loadingState?.classList.add('hidden');
+
+      // Allow supervisors and administrators
+      if (!user || (user.role !== 'supervisor' && user.role !== 'administrador')) {
+        accessDenied?.classList.remove('hidden');
+        return;
+      }
+
+      supervisorDashboard?.classList.remove('hidden');
+      loadStats();
+      await loadDeliveryTeam();
+
+      // Refresh button
+      document.getElementById('refresh-data')?.addEventListener('click', async () => {
+        loadStats();
+        await loadDeliveryTeam();
+      });
+    });
+  </script>
+</Layout>

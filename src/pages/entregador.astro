@@ -1,0 +1,230 @@
+---
+import Layout from '@layouts/Layout.astro';
+---
+
+<Layout title="Entregador" description="Painel do Entregador Ayronia">
+  <div class="min-h-screen bg-base-200">
+    <div class="container mx-auto px-4 py-8">
+      <!-- Loading state -->
+      <div id="loading-state" class="flex items-center justify-center min-h-[60vh]">
+        <span class="loading loading-spinner loading-lg"></span>
+      </div>
+
+      <!-- Access denied state -->
+      <div id="access-denied" class="hidden flex items-center justify-center min-h-[60vh]">
+        <div class="card bg-base-100 shadow-xl w-full max-w-md">
+          <div class="card-body text-center">
+            <div class="text-6xl mb-4">🚫</div>
+            <h2 class="card-title justify-center text-2xl mb-4">Acesso Negado</h2>
+            <p class="mb-6">Não tem permissão para aceder a esta página. Apenas entregadores podem aceder.</p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+              <a href="/conta" class="btn btn-primary">Ir para Minha Conta</a>
+              <a href="/" class="btn btn-outline">Página Inicial</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Entregador dashboard -->
+      <div id="entregador-dashboard" class="hidden">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+          <div>
+            <h1 class="text-4xl font-bold">Olá, <span id="user-name"></span>!</h1>
+            <p class="text-gray-600 mt-2">Painel do Entregador</p>
+          </div>
+          <div class="flex gap-2">
+            <button id="toggle-status" class="btn btn-success">
+              <span id="status-text">Disponível</span>
+            </button>
+            <a href="/conta" class="btn btn-outline">
+              Minha Conta
+            </a>
+          </div>
+        </div>
+
+        <!-- Status Card -->
+        <div class="card bg-gradient-to-r from-primary to-secondary text-primary-content mb-8">
+          <div class="card-body">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+              <div>
+                <h2 class="text-2xl font-bold">Estado Atual</h2>
+                <p class="opacity-90">As suas estatísticas de hoje</p>
+              </div>
+              <div class="flex gap-8">
+                <div class="text-center">
+                  <p class="text-3xl font-bold" id="deliveries-today">0</p>
+                  <p class="text-sm opacity-80">Entregas Hoje</p>
+                </div>
+                <div class="text-center">
+                  <p class="text-3xl font-bold" id="pending-deliveries">0</p>
+                  <p class="text-sm opacity-80">Pendentes</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Assigned Deliveries -->
+        <div class="card bg-base-100 shadow-xl mb-6">
+          <div class="card-body">
+            <div class="flex items-center justify-between mb-4">
+              <h2 class="card-title">
+                <span class="text-2xl mr-2">📦</span>
+                Entregas Atribuídas
+              </h2>
+              <button class="btn btn-sm btn-outline" id="refresh-deliveries">
+                🔄 Atualizar
+              </button>
+            </div>
+
+            <div id="deliveries-list" class="space-y-4">
+              <div class="alert">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-info shrink-0 w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <span>Nenhuma entrega atribuída de momento. Quando houver pedidos, eles aparecerão aqui.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="card bg-base-100 shadow-xl">
+            <div class="card-body">
+              <h2 class="card-title mb-4">
+                <span class="text-2xl mr-2">⚡</span>
+                Ações Rápidas
+              </h2>
+              <div class="flex flex-col gap-3">
+                <a href="https://wa.me/258849220000" target="_blank" class="btn btn-success w-full">
+                  💬 Contactar Suporte
+                </a>
+                <a href="/contactos" class="btn btn-outline w-full">
+                  📞 Informações de Contacto
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <div class="card bg-base-100 shadow-xl">
+            <div class="card-body">
+              <h2 class="card-title mb-4">
+                <span class="text-2xl mr-2">📊</span>
+                Resumo Semanal
+              </h2>
+              <div class="stats stats-vertical shadow">
+                <div class="stat">
+                  <div class="stat-title">Total de Entregas</div>
+                  <div class="stat-value text-primary" id="weekly-deliveries">0</div>
+                  <div class="stat-desc">Esta semana</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Help Section -->
+        <div class="card bg-base-100 shadow-xl mt-6">
+          <div class="card-body">
+            <h2 class="card-title mb-4">
+              <span class="text-2xl mr-2">❓</span>
+              Instruções
+            </h2>
+            <div class="space-y-2 text-sm text-gray-600">
+              <p>• <strong>Disponível:</strong> Indica que está pronto para receber novas entregas.</p>
+              <p>• <strong>Ocupado:</strong> Indica que está em entrega ou indisponível temporariamente.</p>
+              <p>• Clique em "Atualizar" para ver novas entregas atribuídas.</p>
+              <p>• Em caso de problemas, contacte o suporte através do WhatsApp.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    type UserRole = 'cliente' | 'administrador' | 'supervisor' | 'entregador';
+
+    interface User {
+      id: string;
+      name: string;
+      email: string;
+      role: UserRole;
+    }
+
+    let isAvailable = true;
+
+    async function checkAuthStatus(): Promise<User | null> {
+      const sessionToken = localStorage.getItem('sessionToken');
+      const storedUser = localStorage.getItem('user');
+
+      if (!sessionToken || !storedUser) {
+        return null;
+      }
+
+      try {
+        const response = await fetch('/api/auth/status', {
+          headers: { Authorization: `Bearer ${sessionToken}` },
+        });
+        const result = await response.json();
+        if (result.authenticated) {
+          return result.user;
+        }
+        localStorage.removeItem('sessionToken');
+        localStorage.removeItem('user');
+        return null;
+      } catch (error) {
+        console.error('Auth check error:', error);
+        return null;
+      }
+    }
+
+    function toggleStatus() {
+      isAvailable = !isAvailable;
+      const button = document.getElementById('toggle-status')!;
+      const statusText = document.getElementById('status-text')!;
+
+      if (isAvailable) {
+        button.classList.remove('btn-warning');
+        button.classList.add('btn-success');
+        statusText.textContent = 'Disponível';
+      } else {
+        button.classList.remove('btn-success');
+        button.classList.add('btn-warning');
+        statusText.textContent = 'Ocupado';
+      }
+    }
+
+    function loadDeliveries() {
+      // Placeholder - will be connected to real orders API
+      document.getElementById('deliveries-today')!.textContent = '0';
+      document.getElementById('pending-deliveries')!.textContent = '0';
+      document.getElementById('weekly-deliveries')!.textContent = '0';
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const loadingState = document.getElementById('loading-state');
+      const accessDenied = document.getElementById('access-denied');
+      const entregadorDashboard = document.getElementById('entregador-dashboard');
+
+      const user = await checkAuthStatus();
+
+      loadingState?.classList.add('hidden');
+
+      // Allow entregadores and administrators
+      if (!user || (user.role !== 'entregador' && user.role !== 'administrador')) {
+        accessDenied?.classList.remove('hidden');
+        return;
+      }
+
+      entregadorDashboard?.classList.remove('hidden');
+      document.getElementById('user-name')!.textContent = user.name.split(' ')[0];
+      loadDeliveries();
+
+      // Toggle status button
+      document.getElementById('toggle-status')?.addEventListener('click', toggleStatus);
+
+      // Refresh button
+      document.getElementById('refresh-deliveries')?.addEventListener('click', loadDeliveries);
+    });
+  </script>
+</Layout>

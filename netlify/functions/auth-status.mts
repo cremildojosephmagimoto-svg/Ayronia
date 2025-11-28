@@ -1,13 +1,6 @@
 import type { Context, Config } from "@netlify/functions";
 import { getStore } from "@netlify/blobs";
-
-interface Session {
-  userId: string;
-  email: string;
-  name: string;
-  createdAt: number;
-  expiresAt: number;
-}
+import type { Session } from "./shared/types.mts";
 
 export default async (req: Request, context: Context) => {
   if (req.method !== "GET") {
@@ -74,6 +67,7 @@ export default async (req: Request, context: Context) => {
           id: session.userId,
           name: session.name,
           email: session.email,
+          role: session.role || 'cliente',
         },
       }),
       {

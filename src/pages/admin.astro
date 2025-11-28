@@ -1,0 +1,378 @@
+---
+import Layout from '@layouts/Layout.astro';
+---
+
+<Layout title="Administração" description="Painel de administração Ayronia">
+  <div class="min-h-screen bg-base-200">
+    <div class="container mx-auto px-4 py-8">
+      <!-- Loading state -->
+      <div id="loading-state" class="flex items-center justify-center min-h-[60vh]">
+        <span class="loading loading-spinner loading-lg"></span>
+      </div>
+
+      <!-- Access denied state -->
+      <div id="access-denied" class="hidden flex items-center justify-center min-h-[60vh]">
+        <div class="card bg-base-100 shadow-xl w-full max-w-md">
+          <div class="card-body text-center">
+            <div class="text-6xl mb-4">🚫</div>
+            <h2 class="card-title justify-center text-2xl mb-4">Acesso Negado</h2>
+            <p class="mb-6">Não tem permissão para aceder a esta página. Apenas administradores podem aceder ao painel de administração.</p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+              <a href="/conta" class="btn btn-primary">Ir para Minha Conta</a>
+              <a href="/" class="btn btn-outline">Página Inicial</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Admin dashboard -->
+      <div id="admin-dashboard" class="hidden">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+          <div>
+            <h1 class="text-4xl font-bold">Painel de Administração</h1>
+            <p class="text-gray-600 mt-2">Gestão de utilizadores e acessos</p>
+          </div>
+          <a href="/conta" class="btn btn-outline">
+            Voltar para Minha Conta
+          </a>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          <div class="card bg-base-100 shadow-xl">
+            <div class="card-body">
+              <h3 class="text-sm text-gray-600">Total de Utilizadores</h3>
+              <p class="text-3xl font-bold" id="total-users">-</p>
+            </div>
+          </div>
+          <div class="card bg-base-100 shadow-xl">
+            <div class="card-body">
+              <h3 class="text-sm text-gray-600">Clientes</h3>
+              <p class="text-3xl font-bold text-primary" id="total-clientes">-</p>
+            </div>
+          </div>
+          <div class="card bg-base-100 shadow-xl">
+            <div class="card-body">
+              <h3 class="text-sm text-gray-600">Supervisores</h3>
+              <p class="text-3xl font-bold text-secondary" id="total-supervisores">-</p>
+            </div>
+          </div>
+          <div class="card bg-base-100 shadow-xl">
+            <div class="card-body">
+              <h3 class="text-sm text-gray-600">Entregadores</h3>
+              <p class="text-3xl font-bold text-accent" id="total-entregadores">-</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Users Table -->
+        <div class="card bg-base-100 shadow-xl">
+          <div class="card-body">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+              <h2 class="card-title text-2xl">Gestão de Utilizadores</h2>
+              <div class="form-control">
+                <input
+                  type="text"
+                  id="search-users"
+                  placeholder="Pesquisar por nome ou email..."
+                  class="input input-bordered w-full sm:w-80"
+                />
+              </div>
+            </div>
+
+            <div class="overflow-x-auto">
+              <table class="table table-zebra">
+                <thead>
+                  <tr>
+                    <th>Nome</th>
+                    <th>Email</th>
+                    <th>Telefone</th>
+                    <th>Perfil</th>
+                    <th>Status</th>
+                    <th>Ações</th>
+                  </tr>
+                </thead>
+                <tbody id="users-table-body">
+                  <tr>
+                    <td colspan="6" class="text-center py-8">
+                      <span class="loading loading-spinner loading-md"></span>
+                      <p class="mt-2">A carregar utilizadores...</p>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Role Change Modal -->
+  <dialog id="role-modal" class="modal">
+    <div class="modal-box">
+      <h3 class="font-bold text-lg mb-4">Alterar Perfil do Utilizador</h3>
+      <div class="space-y-4">
+        <div>
+          <p class="text-sm text-gray-600">Utilizador:</p>
+          <p class="font-bold" id="modal-user-name"></p>
+          <p class="text-sm text-gray-500" id="modal-user-email"></p>
+        </div>
+        <div class="form-control">
+          <label class="label">
+            <span class="label-text">Novo Perfil</span>
+          </label>
+          <select id="modal-role-select" class="select select-bordered w-full">
+            <option value="cliente">Cliente</option>
+            <option value="entregador">Entregador</option>
+            <option value="supervisor">Supervisor</option>
+            <option value="administrador">Administrador</option>
+          </select>
+        </div>
+        <div id="modal-error" class="alert alert-error hidden">
+          <span id="modal-error-message"></span>
+        </div>
+      </div>
+      <div class="modal-action">
+        <button class="btn" onclick="document.getElementById('role-modal').close()">Cancelar</button>
+        <button class="btn btn-primary" id="modal-save-btn">
+          <span id="modal-save-text">Guardar</span>
+          <span id="modal-save-loading" class="loading loading-spinner hidden"></span>
+        </button>
+      </div>
+    </div>
+    <form method="dialog" class="modal-backdrop">
+      <button>close</button>
+    </form>
+  </dialog>
+
+  <script>
+    type UserRole = 'cliente' | 'administrador' | 'supervisor' | 'entregador';
+
+    interface User {
+      id: string;
+      name: string;
+      email: string;
+      phone?: string;
+      role: UserRole;
+      verified: boolean;
+      createdAt: string;
+    }
+
+    const ROLE_DISPLAY_NAMES: Record<UserRole, string> = {
+      cliente: 'Cliente',
+      administrador: 'Administrador',
+      supervisor: 'Supervisor',
+      entregador: 'Entregador',
+    };
+
+    const ROLE_BADGE_CLASSES: Record<UserRole, string> = {
+      cliente: 'badge-primary',
+      administrador: 'badge-error',
+      supervisor: 'badge-secondary',
+      entregador: 'badge-accent',
+    };
+
+    let allUsers: User[] = [];
+    let currentEditUser: User | null = null;
+
+    async function checkAuthStatus() {
+      const sessionToken = localStorage.getItem('sessionToken');
+      const storedUser = localStorage.getItem('user');
+
+      if (!sessionToken || !storedUser) {
+        return null;
+      }
+
+      try {
+        const response = await fetch('/api/auth/status', {
+          headers: { Authorization: `Bearer ${sessionToken}` },
+        });
+        const result = await response.json();
+        if (result.authenticated) {
+          return result.user;
+        }
+        localStorage.removeItem('sessionToken');
+        localStorage.removeItem('user');
+        return null;
+      } catch (error) {
+        console.error('Auth check error:', error);
+        return null;
+      }
+    }
+
+    async function loadUsers() {
+      const sessionToken = localStorage.getItem('sessionToken');
+      try {
+        const response = await fetch('/api/admin/users', {
+          headers: { Authorization: `Bearer ${sessionToken}` },
+        });
+        const result = await response.json();
+
+        if (result.success) {
+          allUsers = result.users;
+          updateStats();
+          renderUsers(allUsers);
+        } else {
+          console.error('Failed to load users:', result.error);
+        }
+      } catch (error) {
+        console.error('Error loading users:', error);
+      }
+    }
+
+    function updateStats() {
+      document.getElementById('total-users')!.textContent = allUsers.length.toString();
+      document.getElementById('total-clientes')!.textContent = allUsers.filter(u => u.role === 'cliente').length.toString();
+      document.getElementById('total-supervisores')!.textContent = allUsers.filter(u => u.role === 'supervisor').length.toString();
+      document.getElementById('total-entregadores')!.textContent = allUsers.filter(u => u.role === 'entregador').length.toString();
+    }
+
+    function renderUsers(users: User[]) {
+      const tbody = document.getElementById('users-table-body')!;
+
+      if (users.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="6" class="text-center py-8 text-gray-500">
+              Nenhum utilizador encontrado
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = users.map(user => `
+        <tr>
+          <td>
+            <div class="font-bold">${user.name}</div>
+          </td>
+          <td>${user.email}</td>
+          <td>${user.phone || '-'}</td>
+          <td>
+            <span class="badge ${ROLE_BADGE_CLASSES[user.role] || 'badge-ghost'}">
+              ${ROLE_DISPLAY_NAMES[user.role] || user.role}
+            </span>
+          </td>
+          <td>
+            ${user.verified
+              ? '<span class="badge badge-success badge-sm">Verificado</span>'
+              : '<span class="badge badge-warning badge-sm">Pendente</span>'
+            }
+          </td>
+          <td>
+            <button
+              class="btn btn-sm btn-outline"
+              onclick="openRoleModal('${user.email}')"
+            >
+              Alterar Perfil
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function filterUsers(searchTerm: string) {
+      const term = searchTerm.toLowerCase().trim();
+      if (!term) {
+        renderUsers(allUsers);
+        return;
+      }
+      const filtered = allUsers.filter(user =>
+        user.name.toLowerCase().includes(term) ||
+        user.email.toLowerCase().includes(term)
+      );
+      renderUsers(filtered);
+    }
+
+    function openRoleModal(email: string) {
+      currentEditUser = allUsers.find(u => u.email === email) || null;
+      if (!currentEditUser) return;
+
+      document.getElementById('modal-user-name')!.textContent = currentEditUser.name;
+      document.getElementById('modal-user-email')!.textContent = currentEditUser.email;
+      (document.getElementById('modal-role-select') as HTMLSelectElement).value = currentEditUser.role;
+      document.getElementById('modal-error')!.classList.add('hidden');
+
+      (document.getElementById('role-modal') as HTMLDialogElement).showModal();
+    }
+
+    async function saveRoleChange() {
+      if (!currentEditUser) return;
+
+      const newRole = (document.getElementById('modal-role-select') as HTMLSelectElement).value as UserRole;
+      const sessionToken = localStorage.getItem('sessionToken');
+
+      const saveBtn = document.getElementById('modal-save-btn') as HTMLButtonElement;
+      const saveText = document.getElementById('modal-save-text')!;
+      const saveLoading = document.getElementById('modal-save-loading')!;
+
+      saveBtn.disabled = true;
+      saveText.classList.add('hidden');
+      saveLoading.classList.remove('hidden');
+
+      try {
+        const response = await fetch(`/api/admin/users/${encodeURIComponent(currentEditUser.email)}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${sessionToken}`,
+          },
+          body: JSON.stringify({ role: newRole }),
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+          // Update local data
+          const userIndex = allUsers.findIndex(u => u.email === currentEditUser!.email);
+          if (userIndex >= 0) {
+            allUsers[userIndex].role = newRole;
+          }
+          updateStats();
+          renderUsers(allUsers);
+          (document.getElementById('role-modal') as HTMLDialogElement).close();
+        } else {
+          document.getElementById('modal-error-message')!.textContent = result.error || 'Erro ao atualizar perfil';
+          document.getElementById('modal-error')!.classList.remove('hidden');
+        }
+      } catch (error) {
+        document.getElementById('modal-error-message')!.textContent = 'Erro de conexão. Tente novamente.';
+        document.getElementById('modal-error')!.classList.remove('hidden');
+      } finally {
+        saveBtn.disabled = false;
+        saveText.classList.remove('hidden');
+        saveLoading.classList.add('hidden');
+      }
+    }
+
+    // Make functions available globally
+    (window as any).openRoleModal = openRoleModal;
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const loadingState = document.getElementById('loading-state');
+      const accessDenied = document.getElementById('access-denied');
+      const adminDashboard = document.getElementById('admin-dashboard');
+
+      const user = await checkAuthStatus();
+
+      loadingState?.classList.add('hidden');
+
+      if (!user || user.role !== 'administrador') {
+        accessDenied?.classList.remove('hidden');
+        return;
+      }
+
+      adminDashboard?.classList.remove('hidden');
+      await loadUsers();
+
+      // Search functionality
+      document.getElementById('search-users')?.addEventListener('input', (e) => {
+        filterUsers((e.target as HTMLInputElement).value);
+      });
+
+      // Save role button
+      document.getElementById('modal-save-btn')?.addEventListener('click', saveRoleChange);
+    });
+  </script>
+</Layout>
