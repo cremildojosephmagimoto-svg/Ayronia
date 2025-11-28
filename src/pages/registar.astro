@@ -1,0 +1,315 @@
+---
+import Layout from '@layouts/Layout.astro';
+---
+
+<Layout title="Criar Conta" description="Crie a sua conta na Ayronia">
+  <div class="min-h-screen bg-base-200 flex items-center justify-center py-12 px-4">
+    <div class="card bg-base-100 shadow-xl w-full max-w-md">
+      <div class="card-body">
+        <h1 class="card-title text-3xl justify-center mb-6">Criar Conta</h1>
+
+        <!-- Registration Form -->
+        <form id="register-form" class="space-y-4">
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text">Nome Completo</span>
+            </label>
+            <input
+              type="text"
+              id="name"
+              placeholder="O seu nome completo"
+              class="input input-bordered"
+              required
+            />
+          </div>
+
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text">Email</span>
+            </label>
+            <input
+              type="email"
+              id="email"
+              placeholder="seu@email.com"
+              class="input input-bordered"
+              required
+            />
+          </div>
+
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text">Telefone</span>
+            </label>
+            <input
+              type="tel"
+              id="phone"
+              placeholder="+258 XX XXX XXXX"
+              class="input input-bordered"
+              required
+            />
+          </div>
+
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text">Senha</span>
+            </label>
+            <input
+              type="password"
+              id="password"
+              placeholder="Mínimo 6 caracteres"
+              class="input input-bordered"
+              required
+              minlength="6"
+            />
+          </div>
+
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text">Confirmar Senha</span>
+            </label>
+            <input
+              type="password"
+              id="confirm-password"
+              placeholder="Repita a sua senha"
+              class="input input-bordered"
+              required
+            />
+          </div>
+
+          <div id="register-error" class="alert alert-error hidden">
+            <span id="register-error-message"></span>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-block" id="register-btn">
+            <span id="register-btn-text">Criar Conta</span>
+            <span id="register-loading" class="loading loading-spinner hidden"></span>
+          </button>
+        </form>
+
+        <!-- OTP Verification Form (Hidden initially) -->
+        <div id="otp-section" class="hidden space-y-4">
+          <div class="text-center mb-4">
+            <div class="text-5xl mb-4">📧</div>
+            <h2 class="text-xl font-bold">Verifique o seu Email</h2>
+            <p class="text-gray-600 mt-2">
+              Enviámos um código de verificação para<br/>
+              <span id="verification-email" class="font-bold"></span>
+            </p>
+          </div>
+
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text">Código de Verificação (6 dígitos)</span>
+            </label>
+            <input
+              type="text"
+              id="otp-code"
+              placeholder="000000"
+              class="input input-bordered text-center text-2xl tracking-widest"
+              maxlength="6"
+              pattern="[0-9]{6}"
+              required
+            />
+          </div>
+
+          <div id="otp-error" class="alert alert-error hidden">
+            <span id="otp-error-message"></span>
+          </div>
+
+          <button type="button" class="btn btn-primary btn-block" id="verify-btn">
+            <span id="verify-btn-text">Verificar Código</span>
+            <span id="verify-loading" class="loading loading-spinner hidden"></span>
+          </button>
+
+          <div class="text-center">
+            <p class="text-sm text-gray-600">
+              Não recebeu o código?
+              <button type="button" class="btn btn-link btn-sm p-0" id="resend-btn">
+                Reenviar código
+              </button>
+            </p>
+          </div>
+        </div>
+
+        <div class="divider">OU</div>
+
+        <p class="text-center text-sm">
+          Já tem uma conta?
+          <a href="/login" class="link link-primary font-bold">Entrar</a>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <dialog id="success-modal" class="modal">
+    <div class="modal-box text-center">
+      <div class="text-6xl mb-4">✅</div>
+      <h3 class="font-bold text-2xl mb-4">Conta Criada com Sucesso!</h3>
+      <p class="mb-6">Bem-vindo à Ayronia. A sua conta foi verificada.</p>
+      <div class="modal-action justify-center">
+        <a href="/mercado" class="btn btn-primary">Ir para o Mercado</a>
+      </div>
+    </div>
+  </dialog>
+
+  <script>
+    let currentEmail = '';
+
+    function showError(elementId: string, message: string) {
+      const errorDiv = document.getElementById(elementId);
+      const errorMessage = document.getElementById(`${elementId}-message`);
+      if (errorDiv && errorMessage) {
+        errorMessage.textContent = message;
+        errorDiv.classList.remove('hidden');
+      }
+    }
+
+    function hideError(elementId: string) {
+      const errorDiv = document.getElementById(elementId);
+      if (errorDiv) {
+        errorDiv.classList.add('hidden');
+      }
+    }
+
+    function setLoading(buttonId: string, textId: string, loadingId: string, loading: boolean) {
+      const btn = document.getElementById(buttonId) as HTMLButtonElement;
+      const text = document.getElementById(textId);
+      const spinner = document.getElementById(loadingId);
+
+      if (btn && text && spinner) {
+        btn.disabled = loading;
+        text.classList.toggle('hidden', loading);
+        spinner.classList.toggle('hidden', !loading);
+      }
+    }
+
+    // Registration form submission
+    document.getElementById('register-form')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      hideError('register-error');
+
+      const name = (document.getElementById('name') as HTMLInputElement).value;
+      const email = (document.getElementById('email') as HTMLInputElement).value;
+      const phone = (document.getElementById('phone') as HTMLInputElement).value;
+      const password = (document.getElementById('password') as HTMLInputElement).value;
+      const confirmPassword = (document.getElementById('confirm-password') as HTMLInputElement).value;
+
+      if (password !== confirmPassword) {
+        showError('register-error', 'As senhas não coincidem');
+        return;
+      }
+
+      setLoading('register-btn', 'register-btn-text', 'register-loading', true);
+
+      try {
+        const response = await fetch('/api/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, email, phone, password }),
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+          currentEmail = result.email;
+          document.getElementById('verification-email')!.textContent = result.email;
+          document.getElementById('register-form')!.classList.add('hidden');
+          document.getElementById('otp-section')!.classList.remove('hidden');
+        } else {
+          showError('register-error', result.error || 'Erro ao criar conta');
+        }
+      } catch (error) {
+        showError('register-error', 'Erro de conexão. Tente novamente.');
+      } finally {
+        setLoading('register-btn', 'register-btn-text', 'register-loading', false);
+      }
+    });
+
+    // OTP verification
+    document.getElementById('verify-btn')?.addEventListener('click', async () => {
+      hideError('otp-error');
+
+      const code = (document.getElementById('otp-code') as HTMLInputElement).value;
+
+      if (code.length !== 6) {
+        showError('otp-error', 'Por favor, insira o código de 6 dígitos');
+        return;
+      }
+
+      setLoading('verify-btn', 'verify-btn-text', 'verify-loading', true);
+
+      try {
+        const response = await fetch('/api/auth/verify-otp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: currentEmail, code }),
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+          // Store session token
+          localStorage.setItem('sessionToken', result.sessionToken);
+          localStorage.setItem('user', JSON.stringify(result.user));
+
+          // Show success modal
+          const modal = document.getElementById('success-modal') as HTMLDialogElement;
+          modal?.showModal();
+        } else {
+          showError('otp-error', result.error || 'Código inválido');
+        }
+      } catch (error) {
+        showError('otp-error', 'Erro de conexão. Tente novamente.');
+      } finally {
+        setLoading('verify-btn', 'verify-btn-text', 'verify-loading', false);
+      }
+    });
+
+    // Resend OTP
+    document.getElementById('resend-btn')?.addEventListener('click', async () => {
+      const resendBtn = document.getElementById('resend-btn') as HTMLButtonElement;
+      resendBtn.disabled = true;
+      resendBtn.textContent = 'A enviar...';
+
+      try {
+        const response = await fetch('/api/auth/resend-otp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: currentEmail }),
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+          resendBtn.textContent = 'Código reenviado!';
+          setTimeout(() => {
+            resendBtn.textContent = 'Reenviar código';
+            resendBtn.disabled = false;
+          }, 30000);
+        } else {
+          showError('otp-error', result.error || 'Erro ao reenviar código');
+          resendBtn.textContent = 'Reenviar código';
+          resendBtn.disabled = false;
+        }
+      } catch (error) {
+        showError('otp-error', 'Erro de conexão');
+        resendBtn.textContent = 'Reenviar código';
+        resendBtn.disabled = false;
+      }
+    });
+
+    // Auto-format OTP input
+    document.getElementById('otp-code')?.addEventListener('input', (e) => {
+      const input = e.target as HTMLInputElement;
+      input.value = input.value.replace(/\D/g, '').slice(0, 6);
+    });
+
+    // Check if user is already logged in
+    document.addEventListener('DOMContentLoaded', () => {
+      const sessionToken = localStorage.getItem('sessionToken');
+      if (sessionToken) {
+        window.location.href = '/conta';
+      }
+    });
+  </script>
+</Layout>
