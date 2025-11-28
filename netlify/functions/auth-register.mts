@@ -1,29 +1,14 @@
 import type { Context, Config } from "@netlify/functions";
 import { getStore } from "@netlify/blobs";
 import { Resend } from "resend";
+import type { User, UserRole, OTPData } from "./shared/types.mts";
 
 interface RegisterData {
   name: string;
   email: string;
   phone: string;
   password: string;
-}
-
-interface User {
-  id: string;
-  name: string;
-  email: string;
-  phone: string;
-  passwordHash: string;
-  verified: boolean;
-  createdAt: string;
-}
-
-interface OTPData {
-  code: string;
-  email: string;
-  expiresAt: number;
-  attempts: number;
+  role?: UserRole;
 }
 
 function generateOTP(): string {
@@ -155,6 +140,9 @@ export default async (req: Request, context: Context) => {
     const userId = crypto.randomUUID();
     const passwordHash = await hashPassword(data.password);
 
+    // Default role is 'cliente', other roles can only be assigned by admins
+    const userRole: UserRole = 'cliente';
+
     const user: User = {
       id: userId,
       name: data.name.trim(),
@@ -162,6 +150,7 @@ export default async (req: Request, context: Context) => {
       phone: data.phone.trim(),
       passwordHash,
       verified: false,
+      role: userRole,
       createdAt: new Date().toISOString(),
     };
 
