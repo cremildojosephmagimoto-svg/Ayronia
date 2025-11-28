@@ -16,7 +16,8 @@ const customLinks = [
     { label: '🧰 Serviços', href: '/servicos' },
     { label: '🏢 Sobre Nós', href: '/sobre' },
     { label: '📞 Contacto', href: '/contactos' },
-    { label: 'Carrinho', href: '/carrinho', badge: true }
+    { label: 'Carrinho', href: '/carrinho', badge: true },
+    { label: '👤 Conta', href: '/conta', authRequired: true }
 ];
 ---
 
@@ -30,7 +31,7 @@ const customLinks = [
         </a>
         <div class="flex items-center gap-6">
             <ul class="hidden lg:flex lg:flex-wrap lg:items-center lg:gap-6">
-                {customLinks.map(link => (
+                {customLinks.filter(link => !link.authRequired).map(link => (
                     <li>
                         <a href={link.href} class="no-underline hover:underline flex items-center gap-2">
                             {link.label}
@@ -40,6 +41,15 @@ const customLinks = [
                         </a>
                     </li>
                 ))}
+                <!-- Auth Links -->
+                <li class="auth-not-logged-in hidden">
+                    <a href="/login" class="btn btn-primary btn-sm">Entrar</a>
+                </li>
+                <li class="auth-logged-in hidden">
+                    <a href="/conta" class="no-underline hover:underline flex items-center gap-2">
+                        <span class="user-name-display">👤 Conta</span>
+                    </a>
+                </li>
             </ul>
             {
                 navLinks && navLinks.length > 0 && (
@@ -67,7 +77,7 @@ const customLinks = [
                 </button>
                 <div id="nav-panel" class="nav-panel absolute rounded-box -top-2 -right-2 z-1 shadow-xl bg-base-100 border border-base-200/70">
                     <ul class="flex flex-col px-4 pb-6 pt-14">
-                        {customLinks.map(link => (
+                        {customLinks.filter(link => !link.authRequired).map(link => (
                             <li>
                                 <a href={link.href} class="block py-2 no-underline hover:underline flex items-center gap-2">
                                     {link.label}
@@ -77,6 +87,18 @@ const customLinks = [
                                 </a>
                             </li>
                         ))}
+                        <!-- Mobile Auth Links -->
+                        <li class="auth-not-logged-in-mobile hidden pt-4">
+                            <a href="/login" class="btn btn-primary btn-block">Entrar</a>
+                        </li>
+                        <li class="auth-not-logged-in-mobile hidden pt-2">
+                            <a href="/registar" class="btn btn-outline btn-block">Criar Conta</a>
+                        </li>
+                        <li class="auth-logged-in-mobile hidden pt-4">
+                            <a href="/conta" class="block py-2 no-underline hover:underline flex items-center gap-2">
+                                <span class="user-name-display-mobile">👤 Minha Conta</span>
+                            </a>
+                        </li>
                         {navLinks && navLinks.length > 0 && navLinks.map((item, index) => (
                             <li>
                                 <Action
@@ -176,14 +198,59 @@ const customLinks = [
         });
     }
 
+    function updateAuthState() {
+        const sessionToken = localStorage.getItem('sessionToken');
+        const userStr = localStorage.getItem('user');
+        const isLoggedIn = sessionToken && userStr;
+
+        // Desktop elements
+        const authNotLoggedIn = document.querySelectorAll('.auth-not-logged-in');
+        const authLoggedIn = document.querySelectorAll('.auth-logged-in');
+
+        // Mobile elements
+        const authNotLoggedInMobile = document.querySelectorAll('.auth-not-logged-in-mobile');
+        const authLoggedInMobile = document.querySelectorAll('.auth-logged-in-mobile');
+
+        // User name displays
+        const userNameDisplays = document.querySelectorAll('.user-name-display, .user-name-display-mobile');
+
+        if (isLoggedIn) {
+            const user = JSON.parse(userStr);
+            const firstName = user.name?.split(' ')[0] || 'Conta';
+
+            // Hide not logged in, show logged in
+            authNotLoggedIn.forEach(el => el.classList.add('hidden'));
+            authLoggedIn.forEach(el => el.classList.remove('hidden'));
+            authNotLoggedInMobile.forEach(el => el.classList.add('hidden'));
+            authLoggedInMobile.forEach(el => el.classList.remove('hidden'));
+
+            // Update user name displays
+            userNameDisplays.forEach(el => {
+                el.textContent = `👤 ${firstName}`;
+            });
+        } else {
+            // Show not logged in, hide logged in
+            authNotLoggedIn.forEach(el => el.classList.remove('hidden'));
+            authLoggedIn.forEach(el => el.classList.add('hidden'));
+            authNotLoggedInMobile.forEach(el => el.classList.remove('hidden'));
+            authLoggedInMobile.forEach(el => el.classList.add('hidden'));
+        }
+    }
+
     navToggle();
     updateCartBadge();
-    
-    window.addEventListener('storage', updateCartBadge);
+    updateAuthState();
+
+    window.addEventListener('storage', () => {
+        updateCartBadge();
+        updateAuthState();
+    });
     setInterval(updateCartBadge, 1000);
-    
+    setInterval(updateAuthState, 2000);
+
     document.addEventListener('astro:after-swap', () => {
         navToggle();
         updateCartBadge();
+        updateAuthState();
     });
 </script>

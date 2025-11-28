@@ -1,0 +1,221 @@
+---
+import Layout from '@layouts/Layout.astro';
+---
+
+<Layout title="Minha Conta" description="Gerir a sua conta Ayronia">
+  <div class="min-h-screen bg-base-200">
+    <div class="container mx-auto px-4 py-8">
+      <!-- Loading state -->
+      <div id="loading-state" class="flex items-center justify-center min-h-[60vh]">
+        <span class="loading loading-spinner loading-lg"></span>
+      </div>
+
+      <!-- Not logged in state -->
+      <div id="not-logged-in" class="hidden flex items-center justify-center min-h-[60vh]">
+        <div class="card bg-base-100 shadow-xl w-full max-w-md">
+          <div class="card-body text-center">
+            <div class="text-6xl mb-4">🔒</div>
+            <h2 class="card-title justify-center text-2xl mb-4">Acesso Restrito</h2>
+            <p class="mb-6">Por favor, faça login para aceder à sua conta.</p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+              <a href="/login" class="btn btn-primary">Entrar</a>
+              <a href="/registar" class="btn btn-outline">Criar Conta</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Logged in state -->
+      <div id="logged-in" class="hidden">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+          <div>
+            <h1 class="text-4xl font-bold">Olá, <span id="user-name"></span>!</h1>
+            <p class="text-gray-600 mt-2">Bem-vindo à sua conta Ayronia</p>
+          </div>
+          <button id="logout-btn" class="btn btn-outline btn-error">
+            Terminar Sessão
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <!-- Profile Card -->
+          <div class="card bg-base-100 shadow-xl">
+            <div class="card-body">
+              <h2 class="card-title">
+                <span class="text-2xl mr-2">👤</span>
+                Os Meus Dados
+              </h2>
+              <div class="space-y-3 mt-4">
+                <div>
+                  <p class="text-sm text-gray-600">Nome</p>
+                  <p class="font-bold" id="profile-name"></p>
+                </div>
+                <div>
+                  <p class="text-sm text-gray-600">Email</p>
+                  <p class="font-bold" id="profile-email"></p>
+                </div>
+                <div>
+                  <p class="text-sm text-gray-600">Telefone</p>
+                  <p class="font-bold" id="profile-phone"></p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Actions Card -->
+          <div class="card bg-base-100 shadow-xl">
+            <div class="card-body">
+              <h2 class="card-title">
+                <span class="text-2xl mr-2">⚡</span>
+                Ações Rápidas
+              </h2>
+              <div class="flex flex-col gap-3 mt-4">
+                <a href="/mercado" class="btn btn-primary btn-outline">
+                  🛒 Ir para o Mercado
+                </a>
+                <a href="/carrinho" class="btn btn-secondary btn-outline">
+                  🛍️ Ver Carrinho
+                </a>
+                <a href="/catering" class="btn btn-accent btn-outline">
+                  🍽️ Serviços de Catering
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Contact Card -->
+          <div class="card bg-base-100 shadow-xl">
+            <div class="card-body">
+              <h2 class="card-title">
+                <span class="text-2xl mr-2">📞</span>
+                Precisa de Ajuda?
+              </h2>
+              <p class="mt-4 text-gray-600">
+                A nossa equipa está disponível para ajudá-lo com qualquer questão.
+              </p>
+              <div class="flex flex-col gap-3 mt-4">
+                <a href="/contactos" class="btn btn-outline">
+                  Contacte-nos
+                </a>
+                <a
+                  href="https://wa.me/258849220000"
+                  target="_blank"
+                  class="btn btn-success text-white"
+                >
+                  💬 WhatsApp
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Account Security Section -->
+        <div class="card bg-base-100 shadow-xl mt-8">
+          <div class="card-body">
+            <h2 class="card-title mb-4">
+              <span class="text-2xl mr-2">🔐</span>
+              Segurança da Conta
+            </h2>
+            <div class="flex flex-wrap gap-4">
+              <div class="badge badge-success gap-2 p-4">
+                ✅ Email Verificado
+              </div>
+              <div class="badge badge-outline gap-2 p-4">
+                🔒 Sessão Activa
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    interface User {
+      id: string;
+      name: string;
+      email: string;
+      phone?: string;
+    }
+
+    async function checkAuthStatus(): Promise<User | null> {
+      const sessionToken = localStorage.getItem('sessionToken');
+      const storedUser = localStorage.getItem('user');
+
+      if (!sessionToken || !storedUser) {
+        return null;
+      }
+
+      try {
+        const response = await fetch('/api/auth/status', {
+          headers: {
+            Authorization: `Bearer ${sessionToken}`,
+          },
+        });
+
+        const result = await response.json();
+
+        if (result.authenticated) {
+          return result.user;
+        } else {
+          // Clear invalid session
+          localStorage.removeItem('sessionToken');
+          localStorage.removeItem('user');
+          return null;
+        }
+      } catch (error) {
+        console.error('Auth check error:', error);
+        return null;
+      }
+    }
+
+    async function logout() {
+      const sessionToken = localStorage.getItem('sessionToken');
+
+      if (sessionToken) {
+        try {
+          await fetch('/api/auth/logout', {
+            method: 'POST',
+            headers: {
+              Authorization: `Bearer ${sessionToken}`,
+            },
+          });
+        } catch (error) {
+          console.error('Logout error:', error);
+        }
+      }
+
+      localStorage.removeItem('sessionToken');
+      localStorage.removeItem('user');
+      window.location.href = '/login';
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const loadingState = document.getElementById('loading-state');
+      const notLoggedIn = document.getElementById('not-logged-in');
+      const loggedIn = document.getElementById('logged-in');
+
+      const user = await checkAuthStatus();
+
+      loadingState?.classList.add('hidden');
+
+      if (user) {
+        // Show logged in state
+        loggedIn?.classList.remove('hidden');
+
+        // Populate user data
+        const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
+        document.getElementById('user-name')!.textContent = user.name.split(' ')[0];
+        document.getElementById('profile-name')!.textContent = user.name;
+        document.getElementById('profile-email')!.textContent = user.email;
+        document.getElementById('profile-phone')!.textContent = storedUser.phone || 'Não definido';
+      } else {
+        // Show not logged in state
+        notLoggedIn?.classList.remove('hidden');
+      }
+    });
+
+    // Logout button
+    document.getElementById('logout-btn')?.addEventListener('click', logout);
+  </script>
+</Layout>
