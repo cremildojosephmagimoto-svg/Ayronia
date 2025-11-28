@@ -163,13 +163,25 @@ export default async (req: Request, context: Context) => {
 
     const emailResult = await sendPasswordResetEmail(normalizedEmail, user.name, resetCode);
 
+    if (!emailResult.success) {
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: "Não foi possível enviar o código de recuperação. Por favor, tente novamente mais tarde.",
+          emailError: emailResult.error,
+        }),
+        {
+          status: 500,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+    }
+
     return new Response(
       JSON.stringify({
         success: true,
         message: "Se este email estiver registado, receberá um código de recuperação.",
         email: normalizedEmail,
-        emailSent: emailResult.success,
-        emailError: emailResult.error,
       }),
       {
         status: 200,
