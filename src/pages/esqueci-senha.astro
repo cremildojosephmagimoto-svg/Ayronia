@@ -1,0 +1,315 @@
+---
+import Layout from '@layouts/Layout.astro';
+---
+
+<Layout title="Recuperar Senha" description="Recupere a sua senha na Ayronia">
+  <div class="min-h-screen bg-base-200 flex items-center justify-center py-12 px-4">
+    <div class="card bg-base-100 shadow-xl w-full max-w-md">
+      <div class="card-body">
+        <h1 class="card-title text-3xl justify-center mb-2">Recuperar Senha</h1>
+        <p class="text-center text-gray-600 mb-6">
+          Insira o seu email para receber um código de recuperação
+        </p>
+
+        <!-- Email Request Form -->
+        <form id="request-form" class="space-y-4">
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text">Email</span>
+            </label>
+            <input
+              type="email"
+              id="email"
+              placeholder="seu@email.com"
+              class="input input-bordered"
+              required
+            />
+          </div>
+
+          <div id="request-error" class="alert alert-error hidden">
+            <span id="request-error-message"></span>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-block" id="request-btn">
+            <span id="request-btn-text">Enviar Código</span>
+            <span id="request-loading" class="loading loading-spinner hidden"></span>
+          </button>
+        </form>
+
+        <!-- Code Verification Section (Hidden initially) -->
+        <div id="verify-section" class="hidden space-y-4">
+          <div class="text-center mb-4">
+            <div class="text-5xl mb-4">🔐</div>
+            <h2 class="text-xl font-bold">Código Enviado</h2>
+            <p class="text-gray-600 mt-2">
+              Insira o código de 6 dígitos enviado para<br/>
+              <span id="verification-email" class="font-bold"></span>
+            </p>
+          </div>
+
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text">Código de Recuperação (6 dígitos)</span>
+            </label>
+            <input
+              type="text"
+              id="reset-code"
+              placeholder="000000"
+              class="input input-bordered text-center text-2xl tracking-widest"
+              maxlength="6"
+              pattern="[0-9]{6}"
+              required
+            />
+          </div>
+
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text">Nova Senha</span>
+            </label>
+            <input
+              type="password"
+              id="new-password"
+              placeholder="Mínimo 6 caracteres"
+              class="input input-bordered"
+              required
+              minlength="6"
+            />
+          </div>
+
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text">Confirmar Nova Senha</span>
+            </label>
+            <input
+              type="password"
+              id="confirm-password"
+              placeholder="Repita a nova senha"
+              class="input input-bordered"
+              required
+            />
+          </div>
+
+          <div id="verify-error" class="alert alert-error hidden">
+            <span id="verify-error-message"></span>
+          </div>
+
+          <button type="button" class="btn btn-primary btn-block" id="reset-btn">
+            <span id="reset-btn-text">Redefinir Senha</span>
+            <span id="reset-loading" class="loading loading-spinner hidden"></span>
+          </button>
+
+          <div class="text-center">
+            <p class="text-sm text-gray-600">
+              Não recebeu o código?
+              <button type="button" class="btn btn-link btn-sm p-0" id="resend-btn">
+                Reenviar código
+              </button>
+            </p>
+          </div>
+
+          <button type="button" class="btn btn-ghost btn-block" id="back-to-request">
+            Voltar
+          </button>
+        </div>
+
+        <div class="divider">OU</div>
+
+        <p class="text-center text-sm">
+          Lembrou-se da senha?
+          <a href="/login" class="link link-primary font-bold">Entrar</a>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <dialog id="success-modal" class="modal">
+    <div class="modal-box text-center">
+      <div class="text-6xl mb-4">✅</div>
+      <h3 class="font-bold text-2xl mb-4">Senha Alterada!</h3>
+      <p class="mb-6">A sua senha foi redefinida com sucesso.</p>
+      <div class="modal-action justify-center">
+        <a href="/conta" class="btn btn-primary">Ir para a Conta</a>
+      </div>
+    </div>
+  </dialog>
+
+  <script>
+    let currentEmail = '';
+
+    function showError(elementId: string, message: string) {
+      const errorDiv = document.getElementById(elementId);
+      const errorMessage = document.getElementById(`${elementId}-message`);
+      if (errorDiv && errorMessage) {
+        errorMessage.textContent = message;
+        errorDiv.classList.remove('hidden');
+      }
+    }
+
+    function hideError(elementId: string) {
+      const errorDiv = document.getElementById(elementId);
+      if (errorDiv) {
+        errorDiv.classList.add('hidden');
+      }
+    }
+
+    function setLoading(buttonId: string, textId: string, loadingId: string, loading: boolean) {
+      const btn = document.getElementById(buttonId) as HTMLButtonElement;
+      const text = document.getElementById(textId);
+      const spinner = document.getElementById(loadingId);
+
+      if (btn && text && spinner) {
+        btn.disabled = loading;
+        text.classList.toggle('hidden', loading);
+        spinner.classList.toggle('hidden', !loading);
+      }
+    }
+
+    function showVerifySection(email: string) {
+      currentEmail = email;
+      document.getElementById('verification-email')!.textContent = email;
+      document.getElementById('request-form')!.classList.add('hidden');
+      document.getElementById('verify-section')!.classList.remove('hidden');
+    }
+
+    function showRequestSection() {
+      document.getElementById('request-form')!.classList.remove('hidden');
+      document.getElementById('verify-section')!.classList.add('hidden');
+      hideError('verify-error');
+    }
+
+    // Request password reset form submission
+    document.getElementById('request-form')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      hideError('request-error');
+
+      const email = (document.getElementById('email') as HTMLInputElement).value;
+
+      setLoading('request-btn', 'request-btn-text', 'request-loading', true);
+
+      try {
+        const response = await fetch('/api/auth/request-password-reset', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email }),
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+          showVerifySection(result.email || email);
+        } else if (result.needsVerification) {
+          // Redirect to login for unverified accounts
+          window.location.href = '/login';
+        } else {
+          showError('request-error', result.error || 'Erro ao processar o pedido');
+        }
+      } catch (error) {
+        showError('request-error', 'Erro de conexão. Tente novamente.');
+      } finally {
+        setLoading('request-btn', 'request-btn-text', 'request-loading', false);
+      }
+    });
+
+    // Reset password
+    document.getElementById('reset-btn')?.addEventListener('click', async () => {
+      hideError('verify-error');
+
+      const code = (document.getElementById('reset-code') as HTMLInputElement).value;
+      const newPassword = (document.getElementById('new-password') as HTMLInputElement).value;
+      const confirmPassword = (document.getElementById('confirm-password') as HTMLInputElement).value;
+
+      if (code.length !== 6) {
+        showError('verify-error', 'Por favor, insira o código de 6 dígitos');
+        return;
+      }
+
+      if (newPassword.length < 6) {
+        showError('verify-error', 'A senha deve ter pelo menos 6 caracteres');
+        return;
+      }
+
+      if (newPassword !== confirmPassword) {
+        showError('verify-error', 'As senhas não coincidem');
+        return;
+      }
+
+      setLoading('reset-btn', 'reset-btn-text', 'reset-loading', true);
+
+      try {
+        const response = await fetch('/api/auth/reset-password', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: currentEmail, code, newPassword }),
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+          // Store session token
+          localStorage.setItem('sessionToken', result.sessionToken);
+          localStorage.setItem('user', JSON.stringify(result.user));
+
+          // Show success modal
+          const modal = document.getElementById('success-modal') as HTMLDialogElement;
+          modal?.showModal();
+        } else {
+          showError('verify-error', result.error || 'Erro ao redefinir a senha');
+        }
+      } catch (error) {
+        showError('verify-error', 'Erro de conexão. Tente novamente.');
+      } finally {
+        setLoading('reset-btn', 'reset-btn-text', 'reset-loading', false);
+      }
+    });
+
+    // Resend code
+    document.getElementById('resend-btn')?.addEventListener('click', async () => {
+      const resendBtn = document.getElementById('resend-btn') as HTMLButtonElement;
+      resendBtn.disabled = true;
+      resendBtn.textContent = 'A enviar...';
+
+      try {
+        const response = await fetch('/api/auth/request-password-reset', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: currentEmail }),
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+          resendBtn.textContent = 'Código reenviado!';
+          setTimeout(() => {
+            resendBtn.textContent = 'Reenviar código';
+            resendBtn.disabled = false;
+          }, 30000);
+        } else {
+          showError('verify-error', result.error || 'Erro ao reenviar código');
+          resendBtn.textContent = 'Reenviar código';
+          resendBtn.disabled = false;
+        }
+      } catch (error) {
+        showError('verify-error', 'Erro de conexão');
+        resendBtn.textContent = 'Reenviar código';
+        resendBtn.disabled = false;
+      }
+    });
+
+    // Back to request button
+    document.getElementById('back-to-request')?.addEventListener('click', showRequestSection);
+
+    // Auto-format code input
+    document.getElementById('reset-code')?.addEventListener('input', (e) => {
+      const input = e.target as HTMLInputElement;
+      input.value = input.value.replace(/\D/g, '').slice(0, 6);
+    });
+
+    // Check if user is already logged in
+    document.addEventListener('DOMContentLoaded', () => {
+      const sessionToken = localStorage.getItem('sessionToken');
+      if (sessionToken) {
+        window.location.href = '/conta';
+      }
+    });
+  </script>
+</Layout>
