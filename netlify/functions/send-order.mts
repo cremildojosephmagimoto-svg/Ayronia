@@ -1,4 +1,5 @@
 import type { Context } from "@netlify/functions";
+import { Resend } from "resend";
 
 interface OrderData {
   orderNumber: string;
@@ -70,36 +71,38 @@ Método de Pagamento: ${orderData.paymentMethod === "mpesa" ? "M-Pesa" : "Cartã
         `💳 *Pagamento:* ${orderData.paymentMethod === "mpesa" ? "M-Pesa" : "Cartão"}`
     );
 
-    const emailApiKey = Netlify.env.get("EMAIL_API_KEY");
-    const emailApiUrl = Netlify.env.get("EMAIL_API_URL");
+    const resendApiKey = Netlify.env.get("RESEND_API_KEY");
 
     let emailSent = false;
     let emailError = null;
 
-    if (emailApiKey && emailApiUrl) {
+    if (resendApiKey) {
       try {
-        const emailResponse = await fetch(emailApiUrl, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${emailApiKey}`,
-          },
-          body: JSON.stringify({
-            to: "aroniacs@gmail.com",
-            from: Netlify.env.get("EMAIL_FROM") || "noreply@ayronia.netlify.app",
-            subject: `Nova Encomenda - ${orderData.orderNumber}`,
-            text: emailBody,
-          }),
+        const resend = new Resend(resendApiKey);
+        const emailFrom = Netlify.env.get("EMAIL_FROM") || "Ayronia <onboarding@resend.dev>";
+        const adminEmail = Netlify.env.get("ADMIN_EMAIL") || "aroniacs@gmail.com";
+
+        const { data, error } = await resend.emails.send({
+          from: emailFrom,
+          to: [adminEmail],
+          subject: `Nova Encomenda - ${orderData.orderNumber}`,
+          text: emailBody,
         });
 
-        if (emailResponse.ok) {
-          emailSent = true;
+        if (error) {
+          console.error("Resend email error:", error);
+          emailError = error.message;
         } else {
-          emailError = `Email API responded with status ${emailResponse.status}`;
+          console.log("Order email sent successfully:", data?.id);
+          emailSent = true;
         }
       } catch (error) {
+        console.error("Error sending order email:", error);
         emailError = error instanceof Error ? error.message : "Unknown error";
       }
+    } else {
+      console.log("RESEND_API_KEY not configured, order email not sent");
+      emailError = "Email service not configured";
     }
 
     return new Response(

@@ -1,5 +1,6 @@
 import type { Context, Config } from "@netlify/functions";
 import { getStore } from "@netlify/blobs";
+import { Resend } from "resend";
 
 interface RegisterData {
   name: string;
@@ -42,15 +43,17 @@ async function sendOTPEmail(
   name: string,
   otp: string
 ): Promise<{ success: boolean; error?: string }> {
-  const emailApiKey = Netlify.env.get("EMAIL_API_KEY");
-  const emailApiUrl = Netlify.env.get("EMAIL_API_URL");
+  const resendApiKey = Netlify.env.get("RESEND_API_KEY");
 
-  if (!emailApiKey || !emailApiUrl) {
-    console.log("Email API not configured, OTP:", otp);
-    return { success: true };
+  if (!resendApiKey) {
+    console.log("RESEND_API_KEY not configured, OTP:", otp);
+    return { success: false, error: "Email service not configured. Please set RESEND_API_KEY environment variable." };
   }
 
   try {
+    const resend = new Resend(resendApiKey);
+    const emailFrom = Netlify.env.get("EMAIL_FROM") || "Ayronia <onboarding@resend.dev>";
+
     const emailBody = `
 Olá ${name},
 
@@ -66,29 +69,25 @@ Obrigado,
 Equipa Ayronia
 `;
 
-    const response = await fetch(emailApiUrl, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${emailApiKey}`,
-      },
-      body: JSON.stringify({
-        to: email,
-        from: Netlify.env.get("EMAIL_FROM") || "noreply@ayronia.netlify.app",
-        subject: `Código de Verificação Ayronia - ${otp}`,
-        text: emailBody,
-      }),
+    const { data, error } = await resend.emails.send({
+      from: emailFrom,
+      to: [email],
+      subject: `Código de Verificação Ayronia - ${otp}`,
+      text: emailBody,
     });
 
-    if (response.ok) {
-      return { success: true };
-    } else {
+    if (error) {
+      console.error("Resend email error:", error);
       return {
         success: false,
-        error: `Email API responded with status ${response.status}`,
+        error: error.message,
       };
     }
+
+    console.log("Email sent successfully:", data?.id);
+    return { success: true };
   } catch (error) {
+    console.error("Error sending email:", error);
     return {
       success: false,
       error: error instanceof Error ? error.message : "Unknown error",
