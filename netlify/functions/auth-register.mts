@@ -168,14 +168,26 @@ export default async (req: Request, context: Context) => {
 
     const emailResult = await sendOTPEmail(normalizedEmail, data.name, otp);
 
+    if (!emailResult.success) {
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: "Não foi possível enviar o código de verificação. Por favor, tente novamente mais tarde.",
+          emailError: emailResult.error,
+        }),
+        {
+          status: 500,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+    }
+
     return new Response(
       JSON.stringify({
         success: true,
         message:
           "Código de verificação enviado para o seu email. Por favor, verifique a sua caixa de entrada.",
         email: normalizedEmail,
-        emailSent: emailResult.success,
-        emailError: emailResult.error,
       }),
       {
         status: 200,
