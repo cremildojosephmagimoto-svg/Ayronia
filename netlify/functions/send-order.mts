@@ -1,5 +1,35 @@
 import type { Context } from "@netlify/functions";
 import { Resend } from "resend";
+import { getStore } from "@netlify/blobs";
+
+// Order status types
+export type OrderStatus = 'pendente' | 'em_preparacao' | 'em_entrega' | 'entregue' | 'pago' | 'cancelado';
+export type PaymentStatus = 'aguardando_pagamento' | 'pago' | 'confirmado';
+
+export interface Order {
+  orderNumber: string;
+  customerName: string;
+  customerEmail: string;
+  customerPhone: string;
+  address: string;
+  city: string;
+  postalCode: string;
+  items: Array<{
+    name: string;
+    quantity: number;
+    price: number;
+  }>;
+  subtotal: number;
+  deliveryFee: number;
+  total: number;
+  paymentMethod: string;
+  paymentStatus: PaymentStatus;
+  orderStatus: OrderStatus;
+  createdAt: string;
+  updatedAt: string;
+  paidAt?: string;
+  paymentConfirmedByCustomer?: boolean;
+}
 
 interface OrderData {
   orderNumber: string;
@@ -31,6 +61,37 @@ export default async (req: Request, context: Context) => {
   try {
     const orderData: OrderData = await req.json();
 
+    // Create order object to store
+    const order: Order = {
+      ...orderData,
+      paymentStatus: 'aguardando_pagamento',
+      orderStatus: 'pendente',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      paymentConfirmedByCustomer: false,
+    };
+
+    // Save order to Netlify Blobs
+    const ordersStore = getStore("orders");
+    await ordersStore.setJSON(`order:${orderData.orderNumber}`, order);
+
+    // Also save to customer's orders list
+    const customerEmail = orderData.customerEmail.toLowerCase().trim();
+    const customerOrdersKey = `customer-orders:${customerEmail}`;
+    let customerOrders: string[] = [];
+
+    try {
+      const existingOrders = await ordersStore.get(customerOrdersKey);
+      if (existingOrders) {
+        customerOrders = JSON.parse(existingOrders);
+      }
+    } catch {
+      customerOrders = [];
+    }
+
+    customerOrders.unshift(orderData.orderNumber);
+    await ordersStore.set(customerOrdersKey, JSON.stringify(customerOrders));
+
     const itemsList = orderData.items
       .map(
         (item) =>
@@ -57,7 +118,10 @@ Subtotal: ${orderData.subtotal} MT
 Taxa de Entrega: ${orderData.deliveryFee} MT
 Total: ${orderData.total} MT
 
-Método de Pagamento: ${orderData.paymentMethod === "mpesa" ? "M-Pesa" : "Cartão"}
+Método de Pagamento: Pagamento na Entrega
+Estado do Pagamento: Aguardando pagamento na recepção
+
+NOTA: O cliente irá pagar na recepção do produto e confirmar o pagamento na plataforma.
 `;
 
     const whatsappMessage = encodeURIComponent(
@@ -68,7 +132,8 @@ Método de Pagamento: ${orderData.paymentMethod === "mpesa" ? "M-Pesa" : "Cartã
         `📍 *Morada:* ${orderData.address}, ${orderData.city}\n\n` +
         `🛍️ *Itens:*\n${itemsList}\n\n` +
         `💰 *Total:* ${orderData.total} MT\n` +
-        `💳 *Pagamento:* ${orderData.paymentMethod === "mpesa" ? "M-Pesa" : "Cartão"}`
+        `💳 *Pagamento:* Na Entrega\n` +
+        `📌 *Estado:* Aguardando pagamento na recepção`
     );
 
     const resendApiKey = Netlify.env.get("RESEND_API_KEY");

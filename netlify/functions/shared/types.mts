@@ -1,6 +1,37 @@
 // User role types for role-based access control
 export type UserRole = 'cliente' | 'administrador' | 'supervisor' | 'entregador';
 
+// Order status types
+export type OrderStatus = 'pendente' | 'em_preparacao' | 'em_entrega' | 'entregue' | 'pago' | 'cancelado';
+export type PaymentStatus = 'aguardando_pagamento' | 'pago' | 'confirmado';
+
+export interface OrderItem {
+  name: string;
+  quantity: number;
+  price: number;
+}
+
+export interface Order {
+  orderNumber: string;
+  customerName: string;
+  customerEmail: string;
+  customerPhone: string;
+  address: string;
+  city: string;
+  postalCode: string;
+  items: OrderItem[];
+  subtotal: number;
+  deliveryFee: number;
+  total: number;
+  paymentMethod: string;
+  paymentStatus: PaymentStatus;
+  orderStatus: OrderStatus;
+  createdAt: string;
+  updatedAt: string;
+  paidAt?: string;
+  paymentConfirmedByCustomer?: boolean;
+}
+
 export interface User {
   id: string;
   name: string;
