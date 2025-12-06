@@ -211,10 +211,13 @@ import Layout from '@layouts/Layout.astro';
         const result = await response.json();
 
         if (result.success) {
-          currentEmail = result.email;
-          document.getElementById('verification-email')!.textContent = result.email;
-          document.getElementById('register-form')!.classList.add('hidden');
-          document.getElementById('otp-section')!.classList.remove('hidden');
+          // Store session token and user data - user is logged in immediately
+          localStorage.setItem('sessionToken', result.sessionToken);
+          localStorage.setItem('user', JSON.stringify(result.user));
+
+          // Show success modal
+          const modal = document.getElementById('success-modal') as HTMLDialogElement;
+          modal?.showModal();
         } else {
           showError('register-error', result.error || 'Erro ao criar conta');
         }

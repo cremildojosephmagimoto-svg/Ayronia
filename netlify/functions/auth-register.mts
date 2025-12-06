@@ -1,7 +1,6 @@
 import type { Context, Config } from "@netlify/functions";
 import { getStore } from "@netlify/blobs";
-import { Resend } from "resend";
-import type { User, UserRole, OTPData } from "./shared/types.mts";
+import type { User, UserRole, Session } from "./shared/types.mts";
 
 interface RegisterData {
   name: string;
@@ -9,10 +8,6 @@ interface RegisterData {
   phone: string;
   password: string;
   role?: UserRole;
-}
-
-function generateOTP(): string {
-  return Math.floor(100000 + Math.random() * 900000).toString();
 }
 
 async function hashPassword(password: string): Promise<string> {
@@ -23,61 +18,12 @@ async function hashPassword(password: string): Promise<string> {
   return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
 }
 
-async function sendOTPEmail(
-  email: string,
-  name: string,
-  otp: string
-): Promise<{ success: boolean; error?: string }> {
-  const resendApiKey = Netlify.env.get("RESEND_API_KEY");
-
-  if (!resendApiKey) {
-    console.log("RESEND_API_KEY not configured, OTP:", otp);
-    return { success: false, error: "Email service not configured. Please set RESEND_API_KEY environment variable." };
-  }
-
-  try {
-    const resend = new Resend(resendApiKey);
-    const emailFrom = Netlify.env.get("EMAIL_FROM") || "Ayronia <onboarding@resend.dev>";
-
-    const emailBody = `
-Olá ${name},
-
-O seu código de verificação para criar a sua conta na Ayronia é:
-
-${otp}
-
-Este código é válido por 10 minutos.
-
-Se não solicitou este código, por favor ignore este email.
-
-Obrigado,
-Equipa Ayronia
-`;
-
-    const { data, error } = await resend.emails.send({
-      from: emailFrom,
-      to: [email],
-      subject: `Código de Verificação Ayronia - ${otp}`,
-      text: emailBody,
-    });
-
-    if (error) {
-      console.error("Resend email error:", error);
-      return {
-        success: false,
-        error: error.message,
-      };
-    }
-
-    console.log("Email sent successfully:", data?.id);
-    return { success: true };
-  } catch (error) {
-    console.error("Error sending email:", error);
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : "Unknown error",
-    };
-  }
+function generateSessionToken(): string {
+  const array = new Uint8Array(32);
+  crypto.getRandomValues(array);
+  return Array.from(array)
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
 }
 
 export default async (req: Request, context: Context) => {
@@ -120,14 +66,14 @@ export default async (req: Request, context: Context) => {
     }
 
     const usersStore = getStore("users");
-    const otpStore = getStore("otp-codes");
+    const sessionsStore = getStore("sessions");
 
     const normalizedEmail = data.email.toLowerCase().trim();
     const existingUser = await usersStore.get(`user:${normalizedEmail}`, {
       type: "json",
     });
 
-    if (existingUser && existingUser.verified) {
+    if (existingUser) {
       return new Response(
         JSON.stringify({ error: "Este email já está registado" }),
         {
@@ -143,51 +89,45 @@ export default async (req: Request, context: Context) => {
     // Default role is 'cliente', other roles can only be assigned by admins
     const userRole: UserRole = 'cliente';
 
+    // User is verified immediately without OTP
     const user: User = {
       id: userId,
       name: data.name.trim(),
       email: normalizedEmail,
       phone: data.phone.trim(),
       passwordHash,
-      verified: false,
+      verified: true,
       role: userRole,
       createdAt: new Date().toISOString(),
     };
 
     await usersStore.setJSON(`user:${normalizedEmail}`, user);
 
-    const otp = generateOTP();
-    const otpData: OTPData = {
-      code: otp,
-      email: normalizedEmail,
-      expiresAt: Date.now() + 10 * 60 * 1000,
-      attempts: 0,
+    // Create session automatically - user is logged in after registration
+    const sessionToken = generateSessionToken();
+    const session: Session = {
+      userId: user.id,
+      email: user.email,
+      name: user.name,
+      role: user.role,
+      createdAt: Date.now(),
+      expiresAt: Date.now() + 7 * 24 * 60 * 60 * 1000, // 7 days
     };
 
-    await otpStore.setJSON(`otp:${normalizedEmail}`, otpData);
-
-    const emailResult = await sendOTPEmail(normalizedEmail, data.name, otp);
-
-    if (!emailResult.success) {
-      return new Response(
-        JSON.stringify({
-          success: false,
-          error: "Não foi possível enviar o código de verificação. Por favor, tente novamente mais tarde.",
-          emailError: emailResult.error,
-        }),
-        {
-          status: 500,
-          headers: { "Content-Type": "application/json" },
-        }
-      );
-    }
+    await sessionsStore.setJSON(`session:${sessionToken}`, session);
 
     return new Response(
       JSON.stringify({
         success: true,
-        message:
-          "Código de verificação enviado para o seu email. Por favor, verifique a sua caixa de entrada.",
-        email: normalizedEmail,
+        message: "Conta criada com sucesso!",
+        user: {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          phone: user.phone,
+          role: user.role,
+        },
+        sessionToken,
       }),
       {
         status: 200,

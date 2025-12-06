@@ -62,18 +62,10 @@ export default async (req: Request, context: Context) => {
       );
     }
 
+    // Auto-verify unverified users on login (no OTP required)
     if (!user.verified) {
-      return new Response(
-        JSON.stringify({
-          error: "Por favor, verifique o seu email antes de fazer login",
-          needsVerification: true,
-          email: normalizedEmail,
-        }),
-        {
-          status: 401,
-          headers: { "Content-Type": "application/json" },
-        }
-      );
+      user.verified = true;
+      await usersStore.setJSON(`user:${normalizedEmail}`, user);
     }
 
     const passwordHash = await hashPassword(data.password);
