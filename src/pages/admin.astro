@@ -37,6 +37,60 @@ import Layout from '@layouts/Layout.astro';
           </a>
         </div>
 
+        <!-- Quick Access Navigation Cards -->
+        <div class="mb-8">
+          <h2 class="text-2xl font-bold mb-4">Acesso Rápido aos Painéis</h2>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Supervisor Panel Card -->
+            <a href="/supervisor" class="card bg-gradient-to-br from-secondary to-orange-500 text-white shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 cursor-pointer">
+              <div class="card-body">
+                <div class="flex items-center gap-4">
+                  <div class="text-5xl">📋</div>
+                  <div>
+                    <h3 class="card-title text-white">Painel Supervisor</h3>
+                    <p class="text-white/80 text-sm">Gestão de pedidos e entregas</p>
+                  </div>
+                </div>
+                <div class="card-actions justify-end mt-4">
+                  <span class="badge badge-ghost bg-white/20 text-white">Aceder</span>
+                </div>
+              </div>
+            </a>
+
+            <!-- Entregador Panel Card -->
+            <a href="/entregador" class="card bg-gradient-to-br from-accent to-yellow-500 text-white shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 cursor-pointer">
+              <div class="card-body">
+                <div class="flex items-center gap-4">
+                  <div class="text-5xl">🚚</div>
+                  <div>
+                    <h3 class="card-title text-white">Painel Entregador</h3>
+                    <p class="text-white/80 text-sm">Visualizar como entregador</p>
+                  </div>
+                </div>
+                <div class="card-actions justify-end mt-4">
+                  <span class="badge badge-ghost bg-white/20 text-white">Aceder</span>
+                </div>
+              </div>
+            </a>
+
+            <!-- User Management Card -->
+            <a href="#users-section" class="card bg-gradient-to-br from-primary to-red-700 text-white shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 cursor-pointer">
+              <div class="card-body">
+                <div class="flex items-center gap-4">
+                  <div class="text-5xl">👥</div>
+                  <div>
+                    <h3 class="card-title text-white">Gestão de Utilizadores</h3>
+                    <p class="text-white/80 text-sm">Gerir perfis e acessos</p>
+                  </div>
+                </div>
+                <div class="card-actions justify-end mt-4">
+                  <span class="badge badge-ghost bg-white/20 text-white">Ver Abaixo</span>
+                </div>
+              </div>
+            </a>
+          </div>
+        </div>
+
         <!-- Stats Cards -->
         <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <div class="card bg-base-100 shadow-xl">
@@ -66,7 +120,7 @@ import Layout from '@layouts/Layout.astro';
         </div>
 
         <!-- Users Table -->
-        <div class="card bg-base-100 shadow-xl">
+        <div id="users-section" class="card bg-base-100 shadow-xl scroll-mt-8">
           <div class="card-body">
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
               <h2 class="card-title text-2xl">Gestão de Utilizadores</h2>
