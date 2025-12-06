@@ -201,7 +201,7 @@ const customLinks = [
     function updateAuthState() {
         const sessionToken = localStorage.getItem('sessionToken');
         const userStr = localStorage.getItem('user');
-        const isLoggedIn = sessionToken && userStr;
+        let isLoggedIn = sessionToken && userStr;
 
         // Desktop elements
         const authNotLoggedIn = document.querySelectorAll('.auth-not-logged-in');
@@ -215,26 +215,36 @@ const customLinks = [
         const userNameDisplays = document.querySelectorAll('.user-name-display, .user-name-display-mobile');
 
         if (isLoggedIn) {
-            const user = JSON.parse(userStr);
-            const firstName = user.name?.split(' ')[0] || 'Conta';
+            let user;
+            try {
+                user = JSON.parse(userStr);
+            } catch (e) {
+                console.error('Error parsing user data:', e);
+                isLoggedIn = false;
+            }
 
-            // Hide not logged in, show logged in
-            authNotLoggedIn.forEach(el => el.classList.add('hidden'));
-            authLoggedIn.forEach(el => el.classList.remove('hidden'));
-            authNotLoggedInMobile.forEach(el => el.classList.add('hidden'));
-            authLoggedInMobile.forEach(el => el.classList.remove('hidden'));
+            if (isLoggedIn && user) {
+                const firstName = user.name?.split(' ')[0] || 'Conta';
 
-            // Update user name displays
-            userNameDisplays.forEach(el => {
-                el.textContent = `👤 ${firstName}`;
-            });
-        } else {
-            // Show not logged in, hide logged in
-            authNotLoggedIn.forEach(el => el.classList.remove('hidden'));
-            authLoggedIn.forEach(el => el.classList.add('hidden'));
-            authNotLoggedInMobile.forEach(el => el.classList.remove('hidden'));
-            authLoggedInMobile.forEach(el => el.classList.add('hidden'));
+                // Hide not logged in, show logged in
+                authNotLoggedIn.forEach(el => el.classList.add('hidden'));
+                authLoggedIn.forEach(el => el.classList.remove('hidden'));
+                authNotLoggedInMobile.forEach(el => el.classList.add('hidden'));
+                authLoggedInMobile.forEach(el => el.classList.remove('hidden'));
+
+                // Update user name displays
+                userNameDisplays.forEach(el => {
+                    el.textContent = `👤 ${firstName}`;
+                });
+                return;
+            }
         }
+
+        // Show not logged in, hide logged in
+        authNotLoggedIn.forEach(el => el.classList.remove('hidden'));
+        authLoggedIn.forEach(el => el.classList.add('hidden'));
+        authNotLoggedInMobile.forEach(el => el.classList.remove('hidden'));
+        authLoggedInMobile.forEach(el => el.classList.add('hidden'));
     }
 
     navToggle();
