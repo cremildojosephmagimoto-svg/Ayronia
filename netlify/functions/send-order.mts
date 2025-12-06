@@ -1,6 +1,7 @@
 import type { Context } from "@netlify/functions";
 import { Resend } from "resend";
 import { getStore } from "@netlify/blobs";
+import type { Session, User } from "./shared/types.mts";
 
 // Order status types
 export type OrderStatus = 'pendente' | 'em_preparacao' | 'em_entrega' | 'entregue' | 'pago' | 'cancelado';
@@ -29,6 +30,7 @@ export interface Order {
   updatedAt: string;
   paidAt?: string;
   paymentConfirmedByCustomer?: boolean;
+  userId?: string;
 }
 
 interface OrderData {
@@ -50,6 +52,44 @@ interface OrderData {
   paymentMethod: string;
 }
 
+// Função para verificar a sessão do utilizador
+async function verifySession(req: Request): Promise<{ valid: boolean; user?: User; error?: string }> {
+  const authHeader = req.headers.get("Authorization");
+  const sessionToken = authHeader?.replace("Bearer ", "");
+
+  if (!sessionToken) {
+    return { valid: false, error: "Token de sessão não fornecido" };
+  }
+
+  const sessionsStore = getStore("sessions");
+  const usersStore = getStore("users");
+
+  const session: Session | null = await sessionsStore.get(
+    `session:${sessionToken}`,
+    { type: "json" }
+  );
+
+  if (!session) {
+    return { valid: false, error: "Sessão inválida" };
+  }
+
+  if (Date.now() > session.expiresAt) {
+    await sessionsStore.delete(`session:${sessionToken}`);
+    return { valid: false, error: "Sessão expirada" };
+  }
+
+  const normalizedEmail = session.email.toLowerCase().trim();
+  const user: User | null = await usersStore.get(`user:${normalizedEmail}`, {
+    type: "json",
+  });
+
+  if (!user) {
+    return { valid: false, error: "Utilizador não encontrado" };
+  }
+
+  return { valid: true, user };
+}
+
 export default async (req: Request, context: Context) => {
   if (req.method !== "POST") {
     return new Response(JSON.stringify({ error: "Method not allowed" }), {
@@ -59,6 +99,22 @@ export default async (req: Request, context: Context) => {
   }
 
   try {
+    // Verificar autenticação do utilizador
+    const authResult = await verifySession(req);
+
+    if (!authResult.valid || !authResult.user) {
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: authResult.error || "Precisa estar registado e fazer login para realizar compras",
+        }),
+        {
+          status: 401,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+    }
+
     const orderData: OrderData = await req.json();
 
     // Create order object to store
@@ -69,6 +125,7 @@ export default async (req: Request, context: Context) => {
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       paymentConfirmedByCustomer: false,
+      userId: authResult.user.id,
     };
 
     // Save order to Netlify Blobs

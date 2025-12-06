@@ -135,7 +135,7 @@ import Layout from '@layouts/Layout.astro';
 
         <p class="text-center text-sm">
           Já tem uma conta?
-          <a href="/login" class="link link-primary font-bold">Entrar</a>
+          <a href="/login" class="link link-primary font-bold" id="login-link">Entrar</a>
         </p>
       </div>
     </div>
@@ -215,9 +215,15 @@ import Layout from '@layouts/Layout.astro';
           localStorage.setItem('sessionToken', result.sessionToken);
           localStorage.setItem('user', JSON.stringify(result.user));
 
-          // Show success modal
-          const modal = document.getElementById('success-modal') as HTMLDialogElement;
-          modal?.showModal();
+          // Check for redirect parameter
+          const redirectUrl = new URLSearchParams(window.location.search).get('redirect');
+          if (redirectUrl) {
+            window.location.href = redirectUrl;
+          } else {
+            // Show success modal
+            const modal = document.getElementById('success-modal') as HTMLDialogElement;
+            modal?.showModal();
+          }
         } else {
           showError('register-error', result.error || 'Erro ao criar conta');
         }
@@ -311,7 +317,17 @@ import Layout from '@layouts/Layout.astro';
     document.addEventListener('DOMContentLoaded', () => {
       const sessionToken = localStorage.getItem('sessionToken');
       if (sessionToken) {
-        window.location.href = '/conta';
+        const redirectUrl = new URLSearchParams(window.location.search).get('redirect') || '/conta';
+        window.location.href = redirectUrl;
+      }
+
+      // Preserve redirect parameter in login link
+      const redirectParam = new URLSearchParams(window.location.search).get('redirect');
+      if (redirectParam) {
+        const loginLink = document.getElementById('login-link') as HTMLAnchorElement;
+        if (loginLink) {
+          loginLink.href = `/login?redirect=${encodeURIComponent(redirectParam)}`;
+        }
       }
     });
   </script>

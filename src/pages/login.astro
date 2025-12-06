@@ -101,7 +101,7 @@ import Layout from '@layouts/Layout.astro';
 
         <p class="text-center text-sm">
           Não tem uma conta?
-          <a href="/registar" class="link link-primary font-bold">Criar conta</a>
+          <a href="/registar" class="link link-primary font-bold" id="register-link">Criar conta</a>
         </p>
       </div>
     </div>
@@ -284,7 +284,17 @@ import Layout from '@layouts/Layout.astro';
     document.addEventListener('DOMContentLoaded', () => {
       const sessionToken = localStorage.getItem('sessionToken');
       if (sessionToken) {
-        window.location.href = '/conta';
+        const redirectUrl = new URLSearchParams(window.location.search).get('redirect') || '/conta';
+        window.location.href = redirectUrl;
+      }
+
+      // Preserve redirect parameter in register link
+      const redirectParam = new URLSearchParams(window.location.search).get('redirect');
+      if (redirectParam) {
+        const registerLink = document.getElementById('register-link') as HTMLAnchorElement;
+        if (registerLink) {
+          registerLink.href = `/registar?redirect=${encodeURIComponent(redirectParam)}`;
+        }
       }
     });
   </script>

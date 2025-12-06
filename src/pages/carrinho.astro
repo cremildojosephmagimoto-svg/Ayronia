@@ -42,6 +42,12 @@ import Layout from '@layouts/Layout.astro';
                 </div>
               </div>
               <div class="card-actions justify-end mt-6">
+                <div id="login-notice" class="hidden w-full mb-3">
+                  <div class="alert alert-warning text-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-5 w-5" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                    <span>Para finalizar a compra, precisa de iniciar sessão ou registar-se.</span>
+                  </div>
+                </div>
                 <a href="/checkout" class="btn btn-primary btn-block btn-lg" id="checkout-btn">
                   Finalizar Compra
                 </a>
@@ -62,6 +68,46 @@ import Layout from '@layouts/Layout.astro';
       image: string;
       description: string;
       quantity: number;
+    }
+
+    // Verificar se o utilizador está autenticado
+    async function checkAuthentication(): Promise<boolean> {
+      const sessionToken = localStorage.getItem('sessionToken');
+
+      if (!sessionToken) {
+        return false;
+      }
+
+      try {
+        const response = await fetch('/api/auth/status', {
+          headers: {
+            'Authorization': `Bearer ${sessionToken}`
+          }
+        });
+
+        const data = await response.json();
+        return data.authenticated === true;
+      } catch {
+        return false;
+      }
+    }
+
+    async function updateCheckoutButton() {
+      const checkoutBtn = document.getElementById('checkout-btn') as HTMLAnchorElement;
+      const loginNotice = document.getElementById('login-notice');
+      const isAuthenticated = await checkAuthentication();
+
+      if (checkoutBtn && loginNotice) {
+        if (!isAuthenticated) {
+          loginNotice.classList.remove('hidden');
+          checkoutBtn.href = '/login?redirect=/carrinho';
+          checkoutBtn.textContent = 'Iniciar Sessão para Comprar';
+        } else {
+          loginNotice.classList.add('hidden');
+          checkoutBtn.href = '/checkout';
+          checkoutBtn.textContent = 'Finalizar Compra';
+        }
+      }
     }
 
     function renderCart() {
@@ -153,6 +199,9 @@ import Layout from '@layouts/Layout.astro';
       });
     }
 
-    document.addEventListener('DOMContentLoaded', renderCart);
+    document.addEventListener('DOMContentLoaded', async () => {
+      renderCart();
+      await updateCheckoutButton();
+    });
   </script>
 </Layout>
