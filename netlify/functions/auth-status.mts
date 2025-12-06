@@ -1,6 +1,6 @@
 import type { Context, Config } from "@netlify/functions";
 import { getStore } from "@netlify/blobs";
-import type { Session } from "./shared/types.mts";
+import type { Session, User } from "./shared/types.mts";
 
 export default async (req: Request, context: Context) => {
   if (req.method !== "GET") {
@@ -28,6 +28,8 @@ export default async (req: Request, context: Context) => {
     }
 
     const sessionsStore = getStore("sessions");
+    const usersStore = getStore("users");
+
     const session: Session | null = await sessionsStore.get(
       `session:${sessionToken}`,
       { type: "json" }
@@ -60,14 +62,24 @@ export default async (req: Request, context: Context) => {
       );
     }
 
+    // Fetch the current user from the database to get the most up-to-date role
+    const normalizedEmail = session.email.toLowerCase().trim();
+    const user: User | null = await usersStore.get(`user:${normalizedEmail}`, {
+      type: "json",
+    });
+
+    // Use the user's current role from database, falling back to session role if user not found
+    const currentRole = user?.role || session.role || 'cliente';
+
     return new Response(
       JSON.stringify({
         authenticated: true,
         user: {
           id: session.userId,
-          name: session.name,
+          name: user?.name || session.name,
           email: session.email,
-          role: session.role || 'cliente',
+          phone: user?.phone,
+          role: currentRole,
         },
       }),
       {

@@ -3,6 +3,11 @@ import { getStore } from "@netlify/blobs";
 import { Resend } from "resend";
 import type { User, UserRole, OTPData } from "./shared/types.mts";
 
+// Initial admin emails - these users will automatically receive admin role upon registration
+const INITIAL_ADMIN_EMAILS: string[] = [
+  "cremildojosephmagimoto@gmail.com",
+];
+
 interface RegisterData {
   name: string;
   email: string;
@@ -140,8 +145,11 @@ export default async (req: Request, context: Context) => {
     const userId = crypto.randomUUID();
     const passwordHash = await hashPassword(data.password);
 
-    // Default role is 'cliente', other roles can only be assigned by admins
-    const userRole: UserRole = 'cliente';
+    // Check if email is in initial admin list, otherwise default to 'cliente'
+    const isInitialAdmin = INITIAL_ADMIN_EMAILS.some(
+      adminEmail => adminEmail.toLowerCase().trim() === normalizedEmail
+    );
+    const userRole: UserRole = isInitialAdmin ? 'administrador' : 'cliente';
 
     const user: User = {
       id: userId,
