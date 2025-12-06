@@ -1,6 +1,11 @@
 import type { Context, Config } from "@netlify/functions";
 import { getStore } from "@netlify/blobs";
-import type { User, Session } from "./shared/types.mts";
+import type { User, Session, UserRole } from "./shared/types.mts";
+
+// Initial admin emails - these users will automatically receive admin role
+const INITIAL_ADMIN_EMAILS: string[] = [
+  "cremildojosephmagimoto@gmail.com",
+];
 
 interface LoginData {
   email: string;
@@ -87,12 +92,26 @@ export default async (req: Request, context: Context) => {
       );
     }
 
+    // Check if user should be an admin (in initial admin list) but isn't yet
+    const isInitialAdmin = INITIAL_ADMIN_EMAILS.some(
+      adminEmail => adminEmail.toLowerCase().trim() === normalizedEmail
+    );
+
+    let effectiveRole: UserRole = user.role || 'cliente';
+
+    // If user is in initial admin list but not yet an admin, upgrade them
+    if (isInitialAdmin && effectiveRole !== 'administrador') {
+      effectiveRole = 'administrador';
+      user.role = 'administrador';
+      await usersStore.setJSON(`user:${normalizedEmail}`, user);
+    }
+
     const sessionToken = generateSessionToken();
     const session: Session = {
       userId: user.id,
       email: user.email,
       name: user.name,
-      role: user.role || 'cliente',
+      role: effectiveRole,
       createdAt: Date.now(),
       expiresAt: Date.now() + 7 * 24 * 60 * 60 * 1000,
     };
@@ -108,7 +127,7 @@ export default async (req: Request, context: Context) => {
           name: user.name,
           email: user.email,
           phone: user.phone,
-          role: user.role || 'cliente',
+          role: effectiveRole,
         },
         sessionToken,
       }),
