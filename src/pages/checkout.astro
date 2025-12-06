@@ -167,6 +167,28 @@ import Layout from '@layouts/Layout.astro';
       quantity: number;
     }
 
+    // Verificar se o utilizador está autenticado
+    async function checkAuthentication(): Promise<boolean> {
+      const sessionToken = localStorage.getItem('sessionToken');
+
+      if (!sessionToken) {
+        return false;
+      }
+
+      try {
+        const response = await fetch('/api/auth/status', {
+          headers: {
+            'Authorization': `Bearer ${sessionToken}`
+          }
+        });
+
+        const data = await response.json();
+        return data.authenticated === true;
+      } catch {
+        return false;
+      }
+    }
+
     function renderOrderSummary() {
       const cart: CartItem[] = JSON.parse(localStorage.getItem('cart') || '[]');
       const orderItemsDiv = document.getElementById('order-items');
@@ -194,8 +216,41 @@ import Layout from '@layouts/Layout.astro';
       `).join('');
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
+    // Preencher dados do utilizador autenticado no formulário
+    function fillUserData() {
+      const userData = localStorage.getItem('user');
+      if (userData) {
+        try {
+          const user = JSON.parse(userData);
+          const form = document.getElementById('checkout-form') as HTMLFormElement;
+          if (form) {
+            const nameInput = form.querySelector('input[type="text"]') as HTMLInputElement;
+            const phoneInput = document.querySelector('input[type="tel"]') as HTMLInputElement;
+            const emailInput = document.querySelector('input[type="email"]') as HTMLInputElement;
+
+            if (nameInput && user.name) nameInput.value = user.name;
+            if (phoneInput && user.phone) phoneInput.value = user.phone;
+            if (emailInput && user.email) emailInput.value = user.email;
+          }
+        } catch {
+          // Ignorar erros de parsing
+        }
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      // Verificar autenticação antes de permitir checkout
+      const isAuthenticated = await checkAuthentication();
+
+      if (!isAuthenticated) {
+        // Redirecionar para login com retorno para checkout
+        alert('Para finalizar a compra, precisa estar registado e fazer login na plataforma.');
+        window.location.href = '/login?redirect=/checkout';
+        return;
+      }
+
       renderOrderSummary();
+      fillUserData();
 
       document.getElementById('confirm-order')?.addEventListener('click', async () => {
         const form = document.getElementById('checkout-form') as HTMLFormElement;
@@ -240,10 +295,12 @@ import Layout from '@layouts/Layout.astro';
         const orderNumber = 'AYR' + Math.floor(Math.random() * 1000000).toString().padStart(6, '0');
 
         try {
+          const sessionToken = localStorage.getItem('sessionToken');
           const response = await fetch('/api/send-order', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
+              'Authorization': `Bearer ${sessionToken}`,
             },
             body: JSON.stringify({
               orderNumber,
