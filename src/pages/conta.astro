@@ -192,9 +192,22 @@ import Layout from '@layouts/Layout.astro';
           },
         });
 
+        if (!response.ok && response.status !== 200) {
+          console.error('Auth check failed with status:', response.status);
+          // Keep local session data, return parsed user
+          try {
+            return JSON.parse(storedUser);
+          } catch {
+            return null;
+          }
+        }
+
         const result = await response.json();
 
         if (result.authenticated) {
+          // Update local storage with fresh user data from server
+          const updatedUser = { ...JSON.parse(storedUser), ...result.user };
+          localStorage.setItem('user', JSON.stringify(updatedUser));
           return result.user;
         } else {
           // Clear invalid session
@@ -204,7 +217,12 @@ import Layout from '@layouts/Layout.astro';
         }
       } catch (error) {
         console.error('Auth check error:', error);
-        return null;
+        // On network error, try to use stored user data
+        try {
+          return JSON.parse(storedUser);
+        } catch {
+          return null;
+        }
       }
     }
 
@@ -263,14 +281,16 @@ import Layout from '@layouts/Layout.astro';
         // Show logged in state
         loggedIn?.classList.remove('hidden');
 
-        // Populate user data
+        // Populate user data - merge server data with stored local data for complete info
         const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
-        const userRole: UserRole = user.role || storedUser.role || 'cliente';
+        const completeUser = { ...storedUser, ...user };
+        const userRole: UserRole = completeUser.role || 'cliente';
 
-        document.getElementById('user-name')!.textContent = user.name.split(' ')[0];
-        document.getElementById('profile-name')!.textContent = user.name;
-        document.getElementById('profile-email')!.textContent = user.email;
-        document.getElementById('profile-phone')!.textContent = storedUser.phone || 'Não definido';
+        const userName = completeUser.name || 'Utilizador';
+        document.getElementById('user-name')!.textContent = userName.split(' ')[0];
+        document.getElementById('profile-name')!.textContent = userName;
+        document.getElementById('profile-email')!.textContent = completeUser.email || 'Não definido';
+        document.getElementById('profile-phone')!.textContent = completeUser.phone || 'Não definido';
         document.getElementById('profile-role')!.textContent = ROLE_DISPLAY_NAMES[userRole] || 'Cliente';
 
         // Setup role badge
