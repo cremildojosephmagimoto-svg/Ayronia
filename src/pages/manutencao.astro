@@ -1,0 +1,89 @@
+---
+// Maintenance page - standalone without layout to avoid external dependencies
+---
+
+<!doctype html>
+<html lang="pt">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Site em Manutenção - Ayronia</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+            body {
+                font-family: 'Poppins', sans-serif;
+                min-height: 100vh;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                text-align: center;
+                padding: 20px;
+            }
+            .container {
+                max-width: 600px;
+                background: rgba(255, 255, 255, 0.1);
+                backdrop-filter: blur(10px);
+                border-radius: 20px;
+                padding: 60px 40px;
+                box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            }
+            .icon {
+                font-size: 80px;
+                margin-bottom: 30px;
+            }
+            h1 {
+                font-size: 2.5rem;
+                font-weight: 700;
+                margin-bottom: 20px;
+            }
+            p {
+                font-size: 1.1rem;
+                line-height: 1.8;
+                opacity: 0.9;
+                margin-bottom: 15px;
+            }
+            .contact {
+                margin-top: 30px;
+                padding-top: 30px;
+                border-top: 1px solid rgba(255, 255, 255, 0.2);
+            }
+            .contact p {
+                font-size: 0.95rem;
+            }
+            @media (max-width: 480px) {
+                h1 {
+                    font-size: 1.8rem;
+                }
+                .container {
+                    padding: 40px 25px;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="icon">🔧</div>
+            <h1>Site em Manutenção</h1>
+            <p>
+                Estamos a realizar algumas melhorias para lhe oferecer uma experiência ainda melhor.
+            </p>
+            <p>
+                Voltaremos em breve. Obrigado pela sua paciência!
+            </p>
+            <div class="contact">
+                <p>
+                    Para questões urgentes, entre em contacto connosco pelo WhatsApp.
+                </p>
+            </div>
+        </div>
+    </body>
+</html>
