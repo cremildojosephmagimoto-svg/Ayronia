@@ -1,0 +1,8 @@
+# Maintenance Mode - Redirect all traffic to maintenance page
+# To disable maintenance mode, remove or comment out these lines
+
+# Allow access to the maintenance page itself
+/manutencao    /manutencao    200
+
+# Redirect everything else to maintenance page
+/*    /manutencao    302
